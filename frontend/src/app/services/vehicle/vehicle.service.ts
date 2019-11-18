@@ -29,7 +29,7 @@ export class VehicleService {
     },
     {
       time: +(new Date('2018-01-01 20:21:33.156')),
-      soc: 11, speed: 2, current: 104, odo: 10222, voltage: 23
+      soc: 11, speed: 2, current: null, odo: 10222, voltage: 23
     },
     {
       time: +(new Date('2018-01-01 20:21:33.161')),

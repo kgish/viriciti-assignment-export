@@ -9,7 +9,7 @@
   <div class="header-row">
     <form [formGroup]="form" fxLayout fxLayoutGap="10px" fxLayoutAlign="space-between center">
       <mat-form-field>
-        <mat-select #selectVehicle formControlName="vehicle" placeholder="Vehicle">
+        <mat-select formControlName="vehicle" placeholder="Vehicle">
           <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle">
             {{vehicle.name}}
           </mat-option>
@@ -17,16 +17,24 @@
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput [min]="minDate" [max]="maxDate" formControlName="fromDate" [matDatepicker]="fromDate" placeholder="From" disabled>
+        <input matInput [min]="minDate" [max]="maxDate" formControlName="fromDate" [matDatepicker]="fromDate"
+               placeholder="From" readonly>
         <mat-datepicker-toggle matSuffix [for]="fromDate"></mat-datepicker-toggle>
-        <mat-datepicker #fromDate disabled="false" [startAt]="minDate"></mat-datepicker>
+        <mat-datepicker #fromDate [startAt]="minDate"></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput [min]="minDate" [max]="maxDate" formControlName="toDate" [matDatepicker]="toDate" placeholder="To" disabled>
+        <input matInput [min]="minDate" [max]="maxDate" formControlName="toDate" [matDatepicker]="toDate"
+               placeholder="To" readonly>
         <mat-datepicker-toggle matSuffix [for]="toDate"></mat-datepicker-toggle>
-        <mat-datepicker #toDate disabled="false" [startAt]="minDate"></mat-datepicker>
+        <mat-datepicker #toDate [startAt]="minDate"></mat-datepicker>
       </mat-form-field>
+
+      <mat-radio-group formControlName="unit">
+        <div class="units">
+          <mat-radio-button class="unit" *ngFor="let unit of units; let idx = index" [value]="unit" [checked]="idx === 0">{{unit}}</mat-radio-button>
+        </div>
+      </mat-radio-group>
 
       <div fxLayout fxLayoutGap="10px">
         <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">Submit</button>

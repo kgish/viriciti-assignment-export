@@ -1,10 +1,9 @@
 import {
   AfterViewInit,
   Component,
-  ElementRef,
   OnDestroy,
-  OnInit, QueryList,
-  ViewChild, ViewChildren
+  OnInit,
+  ViewChild
 } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -12,6 +11,8 @@ import { MatDatepicker, MatPaginator, MatSort, MatTableDataSource } from '@angul
 import { Subscription } from 'rxjs';
 
 import { IValue, IVehicle, VehicleService } from '../../services';
+
+type Unit = 'msec' | 'sec' | 'min' | 'hour' | 'day'
 
 @Component({
   selector: 'app-home',
@@ -23,7 +24,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  @ViewChild('selectVehicle', { static: false }) selectVehicle: ElementRef;
+  @ViewChild('fromDate', { static: false }) fromTo;
   @ViewChild('toDate', { static: false }) dateTo;
 
   form: FormGroup;
@@ -40,6 +41,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   values: IValue[];
 
+  units: Unit[] = [ 'msec', 'sec', 'min', 'hour', 'day' ];
+
   private subscription: Subscription;
 
   constructor(private vehiclesService: VehicleService,
@@ -47,12 +50,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.subscription = this.vehiclesService.getVehicles().subscribe(vehicles => this.vehicles = vehicles);
+    this.subscription = this.vehiclesService.getVehicles().subscribe(vehicles => {
+      this.vehicles = vehicles;
+      this.form.get('vehicle').setValue(vehicles[0]);
+    });
 
     this.form = this.fb.group({
       vehicle: [ '', [ Validators.required ] ],
       fromDate: [ '', [ Validators.required ] ],
       toDate: [ '', [ Validators.required ] ],
+      unit: [ '' ],
     });
 
     this.dataSource.paginator = this.paginator;
@@ -60,14 +67,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // Need to use setTimeout() to avoid ExpressionChangedAfterItHasBeenCheckedError.
     setTimeout(() => {
-        // Put focus on the first select field
-        this.selectVehicle.nativeElement.focus();
-
-        // this.dateFrom.select(this.minDate);
-      }, 200
-    );
+      this.form.get('fromDate').setValue(this.minDate);
+      this.form.get('toDate').setValue(this.minDate);
+    }, 200);
   }
 
   ngOnDestroy(): void {
@@ -76,7 +79,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onSubmit() {
     const vehicle: IVehicle = this.form.value.vehicle;
-    console.log(`onSubmit() vehicle='${JSON.stringify(vehicle)}'`);
+    const fromDate: Date = this.form.value.fromDate;
+    const toDate: Date = this.form.value.toDate;
+    const unit: Unit = this.form.value.unit;
+    console.log(`onSubmit() value='${ JSON.stringify(vehicle) }' fromDate='${ fromDate }' toDate='${ toDate }' unit='${unit}'`);
     this.loading = true;
     setTimeout(() => {
       this.vehiclesService.getVehicleValues(vehicle)
@@ -87,7 +93,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
           error => console.log(error),
           () => this.loading = false);
 
-    }, 3000);
+    }, 1000);
   }
 
   onDownload() {
