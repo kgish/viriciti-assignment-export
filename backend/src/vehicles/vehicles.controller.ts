@@ -13,7 +13,7 @@ import {
     UsePipes,
     ValidationPipe,
 } from '@nestjs/common';
-import { VehiclesService } from './vehicles.service';
+import { IValue, IVehicle, VehiclesService } from './vehicles.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { VehicleStatusValidationPipe } from './pipes/vehicle-status-validation.pipe';
 import { GetVehiclesFilterDto } from './dto/get-vehicles-filter.dto';
@@ -32,59 +32,59 @@ export class VehiclesController {
     constructor(private vehiclesService: VehiclesService) {
     }
 
-    // @Get()
-    // getVehicles(
-    //     @Query(ValidationPipe) filterDto: GetVehiclesFilterDto,
-    //     @GetUser() user: User,
-    // ): Promise<Vehicle[]> {
-    //     this.logger.verbose(`User '${ user.username }' retrieving all vehicles. Filters: ${ JSON.stringify({ filterDto }) }`);
-    //     return this.vehiclesService.getVehicles(filterDto, user);
-    // }
-    //
-    // @Get('/:id')
-    // getVehicleById(
-    //     @Param('id', ParseIntPipe) id: number,
+    @Get()
+    getVehicles(
+        @Query(ValidationPipe) filterDto: GetVehiclesFilterDto,
+        @GetUser() user: User,
+    ): Promise<IVehicle[]> {
+        this.logger.verbose(`User '${ user.username }' retrieving all vehicles. Filters: ${ JSON.stringify({ filterDto }) }`);
+        return this.vehiclesService.getVehicles(filterDto, user);
+    }
+
+    @Get('/:id')
+    getVehicleById(
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser() user: User,
+    ): Promise<IVehicle> {
+        this.logger.verbose(`User '${ user.username }' getting a vehicle. Id: ${ id }`);
+        return this.vehiclesService.getVehicleById(id, user);
+    }
+
+    @Get('/:id/values')
+    getVehicleValuesById(
+        @Param('id', ParseIntPipe) id: number,
+        @GetUser() user: User,
+    ): Promise<IValue[]> {
+        this.logger.verbose(`User '${ user.username }' getting vehicle values. Id: ${ id }`);
+        return this.vehiclesService.getVehicleValuesById(id, user);
+    }
+
+    // @Post()
+    // @UsePipes(ValidationPipe)
+    // createVehicle(
+    //     @Body() createvehicleDto: CreateVehicleDto,
     //     @GetUser() user: User,
     // ): Promise<Vehicle> {
-    //     this.logger.verbose(`User '${ user.username }' getting a vehicle. Id: ${ id }`);
-    //     return this.vehiclesService.getVehicleById(id, user);
+    //     this.logger.verbose(`User '${ user.username }' creating a new vehicle. Data: ${ JSON.stringify({ createvehicleDto }) }`);
+    //     return this.vehiclesService.createVehicle(createvehicleDto, user);
     // }
-
-    @Get()
-    getVehicles(): any[] {
-        return [
-            { id: 1000, name: 'vehicle_001' },
-            { id: 1001, name: 'vehicle_002' },
-            { id: 1002, name: 'vehicle_003' },
-        ];
-    }
-
-    @Post()
-    @UsePipes(ValidationPipe)
-    createVehicle(
-        @Body() createvehicleDto: CreateVehicleDto,
-        @GetUser() user: User,
-    ): Promise<Vehicle> {
-        this.logger.verbose(`User '${ user.username }' creating a new vehicle. Data: ${ JSON.stringify({ createvehicleDto }) }`);
-        return this.vehiclesService.createVehicle(createvehicleDto, user);
-    }
-
-    @Delete('/:id')
-    deleteVehicle(
-        @Param('id', ParseIntPipe) id: number,
-        @GetUser() user: User,
-    ): Promise<void> {
-        this.logger.verbose(`User '${ user.username }' deleting a vehicle. Id: ${ id }`);
-        return this.vehiclesService.deleteVehicle(id, user);
-    }
-
-    @Patch('/:id/status')
-    updateVehicleStatus(
-        @Param('id', ParseIntPipe) id: number,
-        @Body('status', VehicleStatusValidationPipe) status: VehicleStatus,
-        @GetUser() user: User,
-    ): Promise<Vehicle> {
-        this.logger.verbose(`User '${ user.username }' changing a vehicle status. Id: ${ id }, Status: ${ status }`);
-        return this.vehiclesService.updateVehicleStatus(id, status, user);
-    }
+    //
+    // @Delete('/:id')
+    // deleteVehicle(
+    //     @Param('id', ParseIntPipe) id: number,
+    //     @GetUser() user: User,
+    // ): Promise<void> {
+    //     this.logger.verbose(`User '${ user.username }' deleting a vehicle. Id: ${ id }`);
+    //     return this.vehiclesService.deleteVehicle(id, user);
+    // }
+    //
+    // @Patch('/:id/status')
+    // updateVehicleStatus(
+    //     @Param('id', ParseIntPipe) id: number,
+    //     @Body('status', VehicleStatusValidationPipe) status: VehicleStatus,
+    //     @GetUser() user: User,
+    // ): Promise<Vehicle> {
+    //     this.logger.verbose(`User '${ user.username }' changing a vehicle status. Id: ${ id }, Status: ${ status }`);
+    //     return this.vehiclesService.updateVehicleStatus(id, status, user);
+    // }
 }

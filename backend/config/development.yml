@@ -1,8 +1,14 @@
 db:
-  host: localhost
-  username: 'viriciti'
-  password: 'viriciti'
-  synchronize: true
+  postgres:
+    host: localhost
+    username: 'viriciti'
+    password: 'viriciti'
+    synchronize: true
+
+  mongo:
+    host: 'localhost'
+    username: 'viriciti'
+    password: 'viriciti'
 
 jwt:
   secret: 'viriciti'
