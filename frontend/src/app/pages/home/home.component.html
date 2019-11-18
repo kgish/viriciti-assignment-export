@@ -1,0 +1,96 @@
+<h2>
+  <mat-icon>home</mat-icon>
+  Home
+</h2>
+<p>This is the home page.</p>
+
+<div class="mat-elevation-z2">
+
+  <div class="header-row">
+    <form [formGroup]="form" fxLayout fxLayoutGap="10px" fxLayoutAlign="space-between center">
+      <mat-form-field>
+        <mat-select #selectVehicle formControlName="vehicle" placeholder="Vehicle">
+          <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle">
+            {{vehicle.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput [min]="minDate" [max]="maxDate" formControlName="fromDate" [matDatepicker]="fromDate" placeholder="From" disabled>
+        <mat-datepicker-toggle matSuffix [for]="fromDate"></mat-datepicker-toggle>
+        <mat-datepicker #fromDate disabled="false" [startAt]="minDate"></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput [min]="minDate" [max]="maxDate" formControlName="toDate" [matDatepicker]="toDate" placeholder="To" disabled>
+        <mat-datepicker-toggle matSuffix [for]="toDate"></mat-datepicker-toggle>
+        <mat-datepicker #toDate disabled="false" [startAt]="minDate"></mat-datepicker>
+      </mat-form-field>
+
+      <div fxLayout fxLayoutGap="10px">
+        <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">Submit</button>
+        <button mat-raised-button color="secondary" [disabled]="!values || !values.length" (click)="onDownload()">
+          Download
+        </button>
+      </div>
+    </form>
+
+    <mat-progress-bar class="progress-bar" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  </div>
+
+  <div [class.hidden]="loading || !values || !values.length">
+    <table mat-table matSort [dataSource]="dataSource">
+
+      <!-- Date column -->
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+        <td mat-cell *matCellDef="let element">{{element.time | formatDate }}</td>
+      </ng-container>
+
+      <!-- Time column -->
+      <ng-container matColumnDef="time">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Time</th>
+        <td mat-cell *matCellDef="let element">{{element.time}}</td>
+      </ng-container>
+
+      <!-- Soc column -->
+      <ng-container matColumnDef="soc">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Soc</th>
+        <td mat-cell *matCellDef="let element">{{element.soc}}</td>
+      </ng-container>
+
+      <!-- Speed column -->
+      <ng-container matColumnDef="speed">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Speed</th>
+        <td mat-cell *matCellDef="let element">{{element.speed}}</td>
+      </ng-container>
+
+      <!-- Current column -->
+      <ng-container matColumnDef="current">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Current</th>
+        <td mat-cell *matCellDef="let element">{{element.current}}</td>
+      </ng-container>
+
+      <!-- Odo column -->
+      <ng-container matColumnDef="odo">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Odo</th>
+        <td mat-cell *matCellDef="let element">{{element.odo}}</td>
+      </ng-container>
+
+      <!-- Voltage column -->
+      <ng-container matColumnDef="voltage">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>voltage</th>
+        <td mat-cell *matCellDef="let element">{{element.voltage}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+
+    <mat-paginator [pageSizeOptions]="pageOptions" showFirstLastButtons></mat-paginator>
+
+  </div>
+
+</div>

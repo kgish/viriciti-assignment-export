@@ -1,0 +1,63 @@
+version: '2.4'
+
+services:
+
+  postgres:
+    image: postgres:9.6.2-alpine
+    container_name: 'postgres_db'
+    environment:
+      POSTGRES_USER: viriciti
+      POSTGRES_PASSWORD: viriciti
+      POSTGRES_DB: viriciti
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "viriciti"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./db/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - viriciti-network
+
+  mongo:
+    image: mongo:latest
+    container_name: 'mongo_db'
+    environment:
+      MONGO_INITDB_DATABASE: viriciti
+      MONGO_INITDB_ROOT_USERNAME: viriciti
+      MONGO_INITDB_ROOT_PASSWORD: viriciti
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./db/mongo:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - viriciti-network
+
+  mongo-test:
+    image: mongo:latest
+    container_name: 'mongo_test_db'
+    environment:
+      MONGO_INITDB_DATABASE: viriciti-test
+      MONGO_INITDB_ROOT_USERNAME: viriciti-test
+      MONGO_INITDB_ROOT_PASSWORD: viriciti-test
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./db/mongo-test:/data/db
+    ports:
+      - "27018:27017"
+    networks:
+      - viriciti-network
+
+networks:
+  viriciti-network:

@@ -1,0 +1,13 @@
+<mat-toolbar>
+  <div fxFlex fxLayout fxLayoutAlign="start center">
+    <button class="menu-button" type="button" aria-label="Toggle sidenav" mat-icon-button>
+      <mat-icon class="menu-icon" (click)="triggerToggleSidenav()">menu</mat-icon>
+    </button>
+    <h1><a routerLink="home" matTooltip="Go to the home page">{{title}}</a></h1>
+  </div>
+  <div fxFlex fxLayout fxLayoutAlign="center center">
+  </div>
+  <div fxFlex fxLayout fxLayoutAlign="end center">
+    <a routerLink="about" matTooltip="Go to the about page">About</a>
+  </div>
+</mat-toolbar>

@@ -1,0 +1,33 @@
+{
+  "name": "export-assignment",
+  "version": "1.0.0",
+  "description": "Assignment to develop a scalable export process",
+  "scripts": {
+    "test": "mocha --require coffeescript/register ./test/**/*_test.coffee --watch-extension coffee",
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/viriciti/exports-assignment.git"
+  },
+  "devDependencies": {
+    "@types/async": "^3.0.3",
+    "@types/bson": "^4.0.0",
+    "@types/chai": "^4.2.5",
+    "@types/mocha": "^5.2.7",
+    "@types/mongodb": "^3.3.10",
+    "@types/node": "^12.12.7",
+    "@types/underscore": "^1.9.3",
+    "async": "^3.1.0",
+    "bson": "^4.0.2",
+    "chai": "^4.2.0",
+    "coffeescript": "^2.4.1",
+    "mocha": "^6.2.2",
+    "ts-node": "^8.5.0",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "mongodb": "^3.3.3",
+    "underscore": "^1.9.1"
+  }
+}
