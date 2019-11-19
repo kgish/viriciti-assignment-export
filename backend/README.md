@@ -4,6 +4,10 @@
 
 ## Configuration
 
+
+ Module '"/home/kiffin/projects/viriciti-assignment-export/tooling/node_modules/@types/underscore/index"' can only be default-imported using the 'esModuleInterop' flag
+
+
 ## Start
 
 ```
