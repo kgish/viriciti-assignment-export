@@ -1,17 +1,18 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MongoClient } from 'mongodb';
+import { pipeline, Writable } from 'stream';
+import { parallel } from 'async';
+
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { GetVehiclesFilterDto } from './dto/get-vehicles-filter.dto';
 import { VehicleRepository } from './vehicle.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+// import { VehicleStatus } from './vehicle-status.enum';
 import { Vehicle } from './vehicle.entity';
-import { VehicleStatus } from './vehicle-status.enum';
+import { mongoConfig } from '../config/mongodb.config';
 import { User } from '../auth/user.entity';
 
-import { MongoClient } from 'mongodb';
-import { mongoConfig } from '../config/mongodb.config';
-import { pipeline, Writable } from 'stream';
-import { parallel } from 'async';
-import { unwindStream } from '../../../tooling/src/unwind.stream';
+import { unwindStream } from '../lib/unwind.stream';
 
 export interface IVehicle {
     id: number;
@@ -90,24 +91,25 @@ export class VehiclesService {
         const fromMS = +(new Date(fromDate));
         const toMS = +(new Date(toDate));
 
-        const results = {};
+        const values = {};
 
-        parallel({
-                soc: callback => this._getVehicleStats(this.client, vehicle, 'soc', fromMS, toMS, results, callback),
-                speed: callback => this._getVehicleStats(this.client, vehicle, 'speed', fromMS, toMS, results, callback),
-                current: callback => this._getVehicleStats(this.client, vehicle, 'current', fromMS, toMS, results, callback),
-                odo: callback => this._getVehicleStats(this.client, vehicle, 'odo', fromMS, toMS, results, callback),
-                voltage: callback => this._getVehicleStats(this.client, vehicle, 'voltage', fromMS, toMS, results, callback),
-            },
-            (error) => {
+        parallel([
+                callback => this._getVehicleStats(this.client, vehicle, 'soc', fromMS, toMS, values, callback),
+                callback => this._getVehicleStats(this.client, vehicle, 'speed', fromMS, toMS, values, callback),
+                callback => this._getVehicleStats(this.client, vehicle, 'current', fromMS, toMS, values, callback),
+                callback => this._getVehicleStats(this.client, vehicle, 'odo', fromMS, toMS, values, callback),
+                callback => this._getVehicleStats(this.client, vehicle, 'voltage', fromMS, toMS, values, callback),
+            ], (error, results) => {
                 if (error) {
                     this.logger.error(`${ message } => NOK (${ error.message })`);
                 } else {
-                    this.logger.error(`${ message } => OK`);
+                    this.logger.log(`${ message } => OK (${ results.length }`);
                 }
-                return results;
             },
         );
+
+        return values;
+
     }
 
     // Private

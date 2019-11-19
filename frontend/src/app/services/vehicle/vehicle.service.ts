@@ -53,7 +53,7 @@ export class VehicleService {
   }
 
   getVehicleValues(vehicle: IVehicle): Observable<IValue[]> {
-    const url = `/api/vehicles/${vehicle.id}`;
+    const url = `/api/vehicles/${vehicle.id}/values`;
     console.log(`${fn} GET ${url}`);
     return this.http.get<IValue[]>(url)
       .pipe(

@@ -6,19 +6,20 @@ interface IDocument {
     _id: number;
     levels: number[];
     count: number;
-    values: {};
+    values: any;
 }
 
 interface IPoint {
     time: number;
     value: number;
 }
+const sortBy = (key) => (a, b) => (a[key] > b[key]) ? 1 : ((b[key] > a[key]) ? -1 : 0);
 
 const unwindDocument = (document: IDocument) => {
     const unwindLevel = (level: IDocument, time: number, depth: number): any[] => {
-        const subLevels = _.sortBy(_.map((Object.keys(level.values)), Number));
-        if (subLevels.length && level.values[ subLevels[ 0 ] ].values) {
-            return subLevels.map(sl => unwindLevel(level.values[ sl ], time + sl, depth + 1));
+        const subLevels = _.sortBy((Object.keys(level.values)).map(n => Number(n)));
+        if (subLevels.length && level.values[subLevels[0]].values) {
+            return subLevels.map(sl => unwindLevel(level.values[sl], time + sl, depth + 1));
         } else {
             return _.sortBy((_.map(level.values, (value, subtime) => ({
                 time: time + +subtime,

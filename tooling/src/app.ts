@@ -4,7 +4,7 @@ import { parallel } from 'async';
 
 import * as fs from "fs";
 
-import { unwindStream } from "./unwind.stream";
+import { unwindStream } from "./lib/unwind.stream";
 
 const config = {
     db: {
