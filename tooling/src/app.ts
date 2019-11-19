@@ -34,6 +34,12 @@ const vehicle = process.argv[ 2 ] || 'vehicle_001';
 const fromDate = process.argv[ 3 ] || '2018-01-01';
 const toDate = process.argv[ 4 ] || '2018-12-31';
 
+// Sanity check just in case.
+if (+(new Date(fromDate)) > +(new Date(toDate))) {
+    console.log('Sorry, but the fromDate must precede the toDate.');
+    process.exit();
+};
+
 console.log(`vehicle='${vehicle}' fromDate='${fromDate}' toDate='${toDate}'`);
 
 const handleError = (message: string, error: any) =>
