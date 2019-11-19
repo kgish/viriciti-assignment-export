@@ -16,7 +16,7 @@ interface IPoint {
 
 const unwindDocument = (document: IDocument) => {
     const unwindLevel = (level: IDocument, time: number, depth: number): any[] => {
-        const subLevels = _.sortBy(_.map((_.keys(level.values)), Number));
+        const subLevels = _.sortBy(_.map((Object.keys(level.values)), Number));
         if (subLevels.length && level.values[ subLevels[ 0 ] ].values) {
             return subLevels.map(sl => unwindLevel(level.values[ sl ], time + sl, depth + 1));
         } else {
