@@ -28,16 +28,19 @@ interface IValues {
     voltage: number;
 }
 
-interface IEvent {
-    time: number;
-    values: IValues;
-}
+const startTime = +(new Date());
+
+const vehicle = process.argv[ 2 ] || 'vehicle_001';
+const fromDate = process.argv[ 3 ] || '2018-01-01';
+const toDate = process.argv[ 4 ] || '2018-12-31';
+
+console.log(`vehicle='${vehicle}' fromDate='${fromDate}' toDate='${toDate}'`);
 
 const handleError = (message: string, error: any) =>
     console.log('ERROR ' + message + ' : ' + (error.message || JSON.stringify(error)));
 
 try {
-    const uri = `mongodb://${ config.db.username }:${ config.db.password }@${ config.db.host }:${ config.db.port }`;
+    const uri = `mongodb://${config.db.username}:${config.db.password}@${config.db.host}:${config.db.port}`;
     MongoClient.connect(uri, config.db.settings, (error, client) => handleConnect(error, client));
 } catch (error) {
     handleError('connect', error);
@@ -47,18 +50,19 @@ const handleConnect = (error, client: MongoClient) => {
     if (error) {
         handleError('connect', error);
     } else {
+        console.log('Opened connection to database');
         handleConnectSuccess(client, () => {
-            client.close();
+            client.close().then(() => {
+                console.log('Closed connection to database');
+                console.log('Total processing time: %dms', +(new Date()) - startTime);
+            });
         });
     }
 };
 
 const handleConnectSuccess = (client: MongoClient, cb) => {
-    const fromDate = "2018-10-01";
-    const toDate = "2018-10-02";
     const fromMS = +(new Date(fromDate));
     const toMS = +(new Date(toDate));
-    const vehicle = "vehicle_001";
 
     const results = {};
 
@@ -71,7 +75,7 @@ const handleConnectSuccess = (client: MongoClient, cb) => {
         },
         (error) => {
             if (error) {
-                console.log(`handleConnectSuccess() => NOK (${ error.message })`);
+                console.log(`handleConnectSuccess() => NOK (${error.message})`);
             } else {
                 console.log(`handleConnectSuccess() => OK`);
                 handleResults(vehicle, fromDate, toDate, results);
@@ -81,10 +85,10 @@ const handleConnectSuccess = (client: MongoClient, cb) => {
     );
 };
 
-const getVehicleStats = (client: MongoClient, vehicle: string, attribute: string, fromMS: number, toMS: number,
+const getVehicleStats = (client: MongoClient, v: string, attribute: string, fromMS: number, toMS: number,
                          results: any, callback: (error: NodeJS.ErrnoException | null) => void) => {
     const collection = client
-        .db(vehicle)
+        .db(v)
         .collection(attribute);
 
     const source = unwindStream(collection, fromMS, toMS);
@@ -93,11 +97,11 @@ const getVehicleStats = (client: MongoClient, vehicle: string, attribute: string
         objectMode: true,
         write(point, enc, cb) {
             const { time, value } = point;
-            if (!results[time]) {
-                results[time] = {};
-                results[time].values = { soc: null, speed: null, current: null, odo: null, voltage: null };
+            if (!results[ time ]) {
+                results[ time ] = {};
+                results[ time ].values = { soc: null, speed: null, current: null, odo: null, voltage: null };
             }
-            results[time].values[attribute] = value;
+            results[ time ].values[ attribute ] = value;
             cb();
         }
     });
@@ -107,28 +111,28 @@ const getVehicleStats = (client: MongoClient, vehicle: string, attribute: string
         sink,
     ], (error: NodeJS.ErrnoException | null) => {
         if (error) {
-            console.log(`getStats(${ attribute }) => NOK (${ error.message })`);
+            console.log(`getStats(${attribute}) => NOK (${error.message})`);
         } else {
-            console.log(`getStats(${ attribute }) => OK`);
+            console.log(`getStats(${attribute}) => OK`);
         }
         callback(error);
     });
 };
 
-const handleResults = (vehicle: string, fromDate: string, toDate: string, results: any) => {
+const handleResults = (v: string, from: string, to: string, results: any) => {
     const times = Object.keys(results).sort();
-    const path = `${ vehicle }_${ fromDate }_${ toDate }.csv`;
+    const path = `${v}_${from}_${to}.csv`;
     const stream = fs.createWriteStream(path);
-    stream.once('open', fd => {
+    stream.once('open', () => {
         stream.write("time,soc,speed,current,odo,voltage\n");
         times.forEach(t => {
-            const e: IValues = results[t].values;
+            const e: IValues = results[ t ].values;
             stream.write(
-                `${ t },${ fx(e.soc) },${ fx(e.speed) },${ fx(e.current) },${ fx(e.odo) },${ fx(e.voltage) }\n`);
+                `${t},${fx(e.soc)},${fx(e.speed)},${fx(e.current)},${fx(e.odo)},${fx(e.voltage)}\n`);
         });
         stream.end();
     });
-    console.log(`handleResults() => wrote ${ times.length } results to ${ path }`);
+    console.log(`handleResults() => wrote ${times.length} results to ${path}`);
 };
 
 const fx = (n: number | null) => n === null ? '' : n;
