@@ -4,7 +4,7 @@
   "description": "A collection of useful tools",
   "main": "dist/app.js",
   "scripts": {
-    "start": "tsc && node dist/app.js vehicle_001 2018-10-10 2018-10-02",
+    "start": "tsc && node dist/app.js vehicle_001 2018-10-01 2018-10-02",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Kiffin Gish <kiffin.gish@planet.nl> (http://github.com/kgish)",
