@@ -1,5 +1,1 @@
-# Viriciti Asssignment Exports Frontend
-
-## Introduction
-
-## References
+# Frontend

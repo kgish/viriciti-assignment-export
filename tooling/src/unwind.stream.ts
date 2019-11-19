@@ -1,12 +1,24 @@
-// @ts-ignore
 import _ from "underscore";
-import { Transform } from "stream";
+import { Transform, TransformCallback } from "stream";
+import { Collection, FilterQuery } from 'mongodb';
 
-const unwindDocument = (document: any) => {
-    const unwindLevel = (level: any, time: number, currentDepth: number): any[] => {
+interface IDocument {
+    _id: number;
+    levels: number[];
+    count: number;
+    values: {};
+}
+
+interface IPoint {
+    time: number;
+    value: number;
+}
+
+const unwindDocument = (document: IDocument) => {
+    const unwindLevel = (level: IDocument, time: number, depth: number): any[] => {
         const subLevels = _.sortBy(_.map((_.keys(level.values)), Number));
-        if (subLevels.length && level.values[subLevels[0]].values) {
-            return _.map(subLevels, subLevel => unwindLevel(level.values[subLevel], time + subLevel, currentDepth + 1));
+        if (subLevels.length && level.values[ subLevels[ 0 ] ].values) {
+            return subLevels.map(sl => unwindLevel(level.values[ sl ], time + sl, depth + 1));
         } else {
             return _.sortBy((_.map(level.values, (value, subtime) => ({
                 time: time + +subtime,
@@ -18,9 +30,9 @@ const unwindDocument = (document: any) => {
     return _.flatten(unwindLevel(document, +document._id, 0));
 };
 
-export const unwindStream = (collection: any, start: number, end: number) => {
+export const unwindStream = (collection: Collection, start: number, end: number) => {
 
-    const query = {
+    const query: FilterQuery<Collection> = {
         _id: {
             $gte: start - (start % 3600000),
             $lt: end,
@@ -35,8 +47,8 @@ export const unwindStream = (collection: any, start: number, end: number) => {
 
     const unwind = new Transform({
         objectMode: true,
-        transform(doc: any, enc: string, cb) {
-            const points = unwindDocument(doc);
+        transform(document: IDocument, enc: string, cb: TransformCallback) {
+            const points: IPoint[] = unwindDocument(document);
             points.forEach(point => this.push(point));
             cb();
         },
@@ -44,7 +56,7 @@ export const unwindStream = (collection: any, start: number, end: number) => {
 
     const reduce = new Transform({
         objectMode: true,
-        transform(point, enc, cb) {
+        transform(point: IPoint, enc: string, cb: TransformCallback) {
             if (point.time < start) {
                 cb();
             }
