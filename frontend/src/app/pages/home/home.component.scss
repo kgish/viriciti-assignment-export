@@ -7,7 +7,7 @@ table {
   width: 100%;
   th,
   td {
-    padding-left: 5px;
+    padding-left: 0.5rem;
   }
 }
 
@@ -16,5 +16,9 @@ table {
 }
 
 .unit {
+  margin-right: 1rem;
+}
+
+.tab-icon {
   margin-right: 1rem;
 }
