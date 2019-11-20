@@ -17,5 +17,11 @@ db:
       connectTimeoutMS: 5000
       socketTimeoutMS: 5000
 
+rate-limiter:
+  type: Memory
+  points: 100
+  duration: 60
+  keyPrefix: global
+
 jwt:
   expiresIn: 3600

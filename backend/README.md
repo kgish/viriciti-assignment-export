@@ -4,9 +4,67 @@
 
 ## Configuration
 
+All of the configuration parameters can be found in the `config/degfault.yml` file.
 
- Module '"/home/kiffin/projects/viriciti-assignment-export/tooling/node_modules/@types/underscore/index"' can only be default-imported using the 'esModuleInterop' flag
+```
+server:
+  port: 3000
 
+db:
+  postgres:
+    type: 'postgres'
+    port: 5432
+    database: 'viriciti'
+  mongo:
+    type: 'mongo'
+    host: 'localhost'
+    port: 27017
+    username: 'viriciti'
+    password: 'viriciti'
+    settings:
+      useUnifiedTopology: true
+      connectTimeoutMS: 5000
+      socketTimeoutMS: 5000
+
+rate-limiter:
+  points: 100
+  duration: 60
+  keyPrefix: global
+
+jwt:
+  expiresIn: 3600
+```
+
+## ENV
+
+The following environment variables can be used to override the configuration values.
+
+```
+# Postgres
+POSTGRES_HOSTNAME
+POSTGRES_PORT
+POSTGRES_USERNAME
+POSTGRES_PASSWORD
+POSTGRES_DB_NAME
+
+# TypeOrm
+TYPEORM_SYNC
+
+# Mongo
+MONGO_HOSTNAME
+MONGO_PORT
+MONGO_USERNAME
+MONGO_PASSWORD
+MONGO_SETTINGS_USE_UNIFIED_TOPOLOGY
+MONGO_SETTINGS_CONNECT_TIMEOUT_MS
+MONGO_SETTINGS_SOCKET_TIMEOUT_MS
+
+# Rate limiter
+RATE_LIMITER_TYPE
+RATE_LIMITER_POINTS
+RATE_LIMITER_DURATION
+RATE_LIMITER_KEYPREFIX
+```
 
 ## Start
 
@@ -59,9 +117,17 @@ GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
   ...
 ]
 ```
+
+## Rate limiter
+
+```
+@UseInterceptors(RateLimiterInterceptor)
+
+```
   
 ## References
 
 * [NestJS](https://nestjs.com)
 * [TypeORM](https://typeorm.io)
 * [Jest](https://jestjs.io)
+* [node-rate-limiter-flexible](https://github.com/animir/node-rate-limiter-flexible)
