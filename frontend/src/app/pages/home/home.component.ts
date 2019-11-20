@@ -31,6 +31,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   vehicles: IVehicle[];
 
   minDate = new Date('2018-01-01');
+  minDate2 = new Date('2018-01-02');
   maxDate = new Date('2018-12-31');
 
   loading = false;
@@ -69,7 +70,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     setTimeout(() => {
       this.form.get('fromDate').setValue(this.minDate);
-      this.form.get('toDate').setValue(this.minDate);
+      this.form.get('toDate').setValue(this.minDate2);
     }, 200);
   }
 
@@ -85,7 +86,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log(`onSubmit() value='${ JSON.stringify(vehicle) }' fromDate='${ fromDate }' toDate='${ toDate }' unit='${unit}'`);
     this.loading = true;
     setTimeout(() => {
-      this.vehiclesService.getVehicleValues(vehicle)
+      this.vehiclesService.getVehicleValues(vehicle, fromDate, toDate)
         .subscribe(values => {
             this.values = values;
             this.dataSource.data = values;

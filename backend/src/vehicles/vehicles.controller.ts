@@ -52,11 +52,13 @@ export class VehiclesController {
 
     @Get('/:id/values')
     getVehicleValuesById(
+        @Query('fromDate') fromDate,
+        @Query('toDate') toDate,
         @Param('id', ParseIntPipe) id: number,
         @GetUser() user: User,
     ): Promise<IValue[]> {
-        this.logger.verbose(`User '${ user.username }' getting vehicle values. Id: ${ id }`);
-        return this.vehiclesService.getVehicleValuesById(id, user);
+        this.logger.verbose(`User '${ user.username }' getting vehicle values. Id: ${ id }, fromDate: ${ fromDate }, toDate: ${ toDate } `);
+        return this.vehiclesService.getVehicleValuesById(id, user, fromDate, toDate);
     }
 
     // @Post()

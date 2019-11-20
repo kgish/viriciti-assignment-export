@@ -80,6 +80,8 @@ export class VehiclesService {
     async getVehicleValuesById(
         id: number,
         user: User,
+        fromDate: string,
+        toDate: string,
     ): Promise<any> {
         const vehicle = this.vehicles.find(v => v.id === +id);
 
@@ -88,18 +90,10 @@ export class VehiclesService {
         }
 
         const message = `getVehicleValues() vehicle='${ vehicle.name }'`;
-        const fromDate = '2018-10-01';
-        const toDate = '2018-10-02';
+        // const fromDate = '2018-10-01';
+        // const toDate = '2018-10-02';
         const fromMS = +(new Date(fromDate));
         const toMS = +(new Date(toDate));
-        const dummy: IValue[] = [{
-            time: 123456,
-            soc: 7,
-            speed: 89,
-            current: 1011,
-            odo: 121314,
-            voltage: 15161718,
-        }];
 
         return new Promise((resolve, reject) => {
             const values = {};
@@ -204,10 +198,12 @@ export class VehiclesService {
     }
 
     _convertValues(values: any): IValue[] {
-        this.logger.log('_convertValues()');
         const result: IValue[] = [];
+        const times = Object.keys(values).sort();
 
-        Object.keys(values).sort().forEach(time => {
+        this.logger.log(`_convertValues() times=${times.length}`);
+
+        times.forEach(time => {
             const next = values[time];
             if (next) {
                 const v = next.values;
@@ -221,6 +217,7 @@ export class VehiclesService {
                 });
             }
         });
+        this.logger.log('_convertValues() => DONE');
         return result;
     }
 }
