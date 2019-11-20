@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-import { dateYYYYMMDDHHSSMS } from '../lib/utils';
+import { dateYYYYMMDDHHMMSSMS } from '../lib/utils';
 
 @Pipe({
   name: 'formatDate',
@@ -14,6 +14,6 @@ export class FormatDatePipe implements PipeTransform {
   // Private
   _convertMStoDate(timeMS) {
     const d = new Date(timeMS);
-    return dateYYYYMMDDHHSSMS(d);
+    return dateYYYYMMDDHHMMSSMS(d);
   }
 }

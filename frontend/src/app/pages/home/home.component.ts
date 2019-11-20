@@ -7,12 +7,21 @@ import {
 } from '@angular/core';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDatepicker, MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
+import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
 import { Subscription } from 'rxjs';
 
 import { IValue, IVehicle, VehicleService } from '../../services';
+import { MatRadioChange } from '@angular/material/radio';
+import {
+  dateYYYY,
+  dateYYYYMM,
+  dateYYYYMMDD,
+  dateYYYYMMDDHH0000,
+  dateYYYYMMDDHHMM00,
+  dateYYYYMMDDHHMMSS,
+} from '../../lib/utils';
 
-type Unit = 'msec' | 'sec' | 'min' | 'hour' | 'day'
+type Unit = 'msec' | 'sec' | 'min' | 'hour' | 'day';
 
 @Component({
   selector: 'app-home',
@@ -40,9 +49,20 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns: string[] = [ 'date', 'time', 'soc', 'speed', 'current', 'odo', 'voltage' ];
   dataSource = new MatTableDataSource<IValue>();
 
-  values: IValue[];
+  values: IValue[] = [];
 
   units: Unit[] = [ 'msec', 'sec', 'min', 'hour', 'day' ];
+
+  currentUnit: Unit = 'msec';
+
+  filters = {
+    year: dateYYYY,
+    month: dateYYYYMM,
+    day: dateYYYYMMDD,
+    hour: dateYYYYMMDDHH0000,
+    min: dateYYYYMMDDHHMM00,
+    sec: dateYYYYMMDDHHMMSS,
+  };
 
   private subscription: Subscription;
 
@@ -60,7 +80,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       vehicle: [ '', [ Validators.required ] ],
       fromDate: [ '', [ Validators.required ] ],
       toDate: [ '', [ Validators.required ] ],
-      unit: [ '' ],
     });
 
     this.dataSource.paginator = this.paginator;
@@ -82,14 +101,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const vehicle: IVehicle = this.form.value.vehicle;
     const fromDate: Date = this.form.value.fromDate;
     const toDate: Date = this.form.value.toDate;
-    const unit: Unit = this.form.value.unit;
-    console.log(`onSubmit() value='${ JSON.stringify(vehicle) }' fromDate='${ fromDate }' toDate='${ toDate }' unit='${unit}'`);
+    console.log(`onSubmit() value='${ JSON.stringify(vehicle) }' fromDate='${ fromDate }' toDate='${ toDate }'`);
     this.loading = true;
     setTimeout(() => {
       this.vehiclesService.getVehicleValues(vehicle, fromDate, toDate)
         .subscribe(values => {
             this.values = values;
-            this.dataSource.data = values;
+            this._resetDataSource();
           },
           error => console.log(error),
           () => this.loading = false);
@@ -99,5 +117,45 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onDownload() {
     console.log('onDownload() called');
+  }
+
+  unitChanged(event: MatRadioChange) {
+    this.currentUnit = event.value;
+    this._resetDataSource();
+  }
+
+  // Private
+
+  _resetDataSource() {
+    let filteredValues = this.values;
+    if (this.currentUnit !== 'msec') {
+      const filter = this.filters[this.currentUnit];
+      const list = {};
+      filteredValues = [];
+      this.values.forEach(v => {
+        const time = filter(new Date(v.time));
+        if (!list[time]) {
+          list[time] = { soc: 0, speed: 0, current: 0, odo: 0, voltage: 0 };
+        }
+        list[time].time = time;
+        list[time].soc += v.soc;
+        list[time].speed += v.speed;
+        list[time].current += v.current;
+        list[time].odo += v.odo;
+        list[time].voltage += v.voltage;
+      });
+      Object.keys(list).sort().forEach(time => {
+        const v = list[time];
+        filteredValues.push({
+          time: v.time,
+          soc: v.soc || '',
+          speed: v.speed || '',
+          current: v.current || '',
+          odo: v.odo || '',
+          voltage: v.voltage || '',
+        });
+      });
+    }
+    this.dataSource.data = filteredValues;
   }
 }

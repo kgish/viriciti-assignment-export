@@ -30,10 +30,10 @@
         <mat-datepicker #toDate [startAt]="minDate"></mat-datepicker>
       </mat-form-field>
 
-      <mat-radio-group formControlName="unit">
+      <mat-radio-group>
         <div class="units">
           <mat-radio-button class="unit" *ngFor="let unit of units; let idx = index" [value]="unit"
-                            [checked]="idx === 0">{{unit}}</mat-radio-button>
+                            [checked]="idx === 0" (change)="unitChanged($event)">{{unit}}</mat-radio-button>
         </div>
       </mat-radio-group>
 
@@ -73,31 +73,31 @@
           <!-- Soc column -->
           <ng-container matColumnDef="soc">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Soc</th>
-            <td mat-cell *matCellDef="let element">{{element.soc}}</td>
+            <td mat-cell *matCellDef="let element">{{element.soc | number}}</td>
           </ng-container>
 
           <!-- Speed column -->
           <ng-container matColumnDef="speed">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Speed</th>
-            <td mat-cell *matCellDef="let element">{{element.speed}}</td>
+            <td mat-cell *matCellDef="let element">{{element.speed | number}}</td>
           </ng-container>
 
           <!-- Current column -->
           <ng-container matColumnDef="current">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Current</th>
-            <td mat-cell *matCellDef="let element">{{element.current}}</td>
+            <td mat-cell *matCellDef="let element">{{element.current | number}}</td>
           </ng-container>
 
           <!-- Odo column -->
           <ng-container matColumnDef="odo">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Odo</th>
-            <td mat-cell *matCellDef="let element">{{element.odo}}</td>
+            <td mat-cell *matCellDef="let element">{{element.odo | number}}</td>
           </ng-container>
 
           <!-- Voltage column -->
           <ng-container matColumnDef="voltage">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>voltage</th>
-            <td mat-cell *matCellDef="let element">{{element.voltage}}</td>
+            <td mat-cell *matCellDef="let element">{{element.voltage | number}}</td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
