@@ -44,10 +44,10 @@ export class VehiclesService {
         @InjectRepository(VehicleRepository)
         private vehicleRepository: VehicleRepository,
     ) {
-        const uri = `mongodb://${ mongoConfig.username }:${ mongoConfig.password }@${ mongoConfig.host }:${ mongoConfig.port }`;
+        const uri = `mongodb://${mongoConfig.username}:${mongoConfig.password}@${mongoConfig.host}:${mongoConfig.port}`;
         MongoClient.connect(uri, mongoConfig.settings, (error, client) => {
             if (error) {
-                this.logger.error(`Cannot connect to mongo, error='${ error.message }'`);
+                this.logger.error(`Cannot connect to mongo, error='${error.message}'`);
             } else {
                 this.logger.log(`Connected to mongo database`);
                 this.client = client;
@@ -69,7 +69,7 @@ export class VehiclesService {
         const found = this.vehicles.find(v => v.id === +id);
 
         if (!found) {
-            throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
+            throw new NotFoundException(`Vehicle with ID '${id}' not found`);
         }
 
         return Promise.resolve(found);
@@ -82,33 +82,35 @@ export class VehiclesService {
         const vehicle = this.vehicles.find(v => v.id === +id);
 
         if (!vehicle) {
-            throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
+            throw new NotFoundException(`Vehicle with ID '${id}' not found`);
         }
 
-        const message = `getVehicleValues() vehicle='${ vehicle.name }'`;
+        const message = `getVehicleValues() vehicle='${vehicle.name}'`;
         const fromDate = '2018-10-01';
         const toDate = '2018-10-02';
         const fromMS = +(new Date(fromDate));
         const toMS = +(new Date(toDate));
 
-        const values = {};
+        return new Promise((resolve, reject) => {
+            const values = {};
 
-        parallel([
-                callback => this._getVehicleStats(this.client, vehicle, 'soc', fromMS, toMS, values, callback),
-                callback => this._getVehicleStats(this.client, vehicle, 'speed', fromMS, toMS, values, callback),
-                callback => this._getVehicleStats(this.client, vehicle, 'current', fromMS, toMS, values, callback),
-                callback => this._getVehicleStats(this.client, vehicle, 'odo', fromMS, toMS, values, callback),
-                callback => this._getVehicleStats(this.client, vehicle, 'voltage', fromMS, toMS, values, callback),
-            ], (error, results) => {
-                if (error) {
-                    this.logger.error(`${ message } => NOK (${ error.message })`);
-                } else {
-                    this.logger.log(`${ message } => OK (${ results.length }`);
-                }
-            },
-        );
-
-        return values;
+            parallel([
+                    callback => this._getVehicleStats(this.client, vehicle, 'soc', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.client, vehicle, 'speed', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.client, vehicle, 'current', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.client, vehicle, 'odo', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.client, vehicle, 'voltage', fromMS, toMS, values, callback),
+                ], error => {
+                    if (error) {
+                        this.logger.error(`${message} => NOK (${error.message})`);
+                        reject('NOK');
+                    } else {
+                        this.logger.log(`${message} => OK`);
+                        resolve('OK');
+                    }
+                },
+            );
+        });
 
     }
 
@@ -126,11 +128,11 @@ export class VehiclesService {
             objectMode: true,
             write(point, enc, cb) {
                 const { time, value } = point;
-                if (!results[time]) {
-                    results[time] = {};
-                    results[time].values = { soc: null, speed: null, current: null, odo: null, voltage: null };
+                if (!results[ time ]) {
+                    results[ time ] = {};
+                    results[ time ].values = { soc: null, speed: null, current: null, odo: null, voltage: null };
                 }
-                results[time].values[attribute] = value;
+                results[ time ].values[ attribute ] = value;
                 cb();
             },
         });
@@ -140,9 +142,9 @@ export class VehiclesService {
             sink,
         ], (error: NodeJS.ErrnoException | null) => {
             if (error) {
-                this.logger.log(`getStats(${ attribute }) => NOK (${ error.message })`);
+                this.logger.log(`getStats(${attribute}) => NOK (${error.message})`);
             } else {
-                this.logger.log(`getStats(${ attribute }) => OK`);
+                this.logger.log(`getStats(${attribute}) => OK`);
             }
             callback(error);
         });
@@ -175,7 +177,7 @@ export class VehiclesService {
         const result = await this.vehicleRepository.delete({ id, userId: user.id });
 
         if (result.affected === 0) {
-            throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
+            throw new NotFoundException(`Vehicle with ID '${id}' not found`);
         }
     }
 
