@@ -44,10 +44,10 @@ export class VehiclesService {
         @InjectRepository(VehicleRepository)
         private vehicleRepository: VehicleRepository,
     ) {
-        const uri = `mongodb://${mongoConfig.username}:${mongoConfig.password}@${mongoConfig.host}:${mongoConfig.port}`;
+        const uri = `mongodb://${ mongoConfig.username }:${ mongoConfig.password }@${ mongoConfig.host }:${ mongoConfig.port }`;
         MongoClient.connect(uri, mongoConfig.settings, (error, client) => {
             if (error) {
-                this.logger.error(`Cannot connect to mongo, error='${error.message}'`);
+                this.logger.error(`Cannot connect to mongo, error='${ error.message }'`);
             } else {
                 this.logger.log(`Connected to mongo database`);
                 this.client = client;
@@ -59,6 +59,7 @@ export class VehiclesService {
         filterDto: GetVehiclesFilterDto,
         user: User,
     ): Promise<IVehicle[]> {
+        // return this.taskRepository.getTasks(filterDto, user);
         return Promise.resolve(this.vehicles);
     }
 
@@ -66,13 +67,14 @@ export class VehiclesService {
         id: number,
         user: User,
     ): Promise<IVehicle> {
+        // const found = await this.vehicleRepository.findOne({ where: { id, userId: user.id } });
         const found = this.vehicles.find(v => v.id === +id);
 
         if (!found) {
-            throw new NotFoundException(`Vehicle with ID '${id}' not found`);
+            throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
         }
 
-        return Promise.resolve(found);
+        return found;
     }
 
     async getVehicleValuesById(
@@ -82,14 +84,22 @@ export class VehiclesService {
         const vehicle = this.vehicles.find(v => v.id === +id);
 
         if (!vehicle) {
-            throw new NotFoundException(`Vehicle with ID '${id}' not found`);
+            throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
         }
 
-        const message = `getVehicleValues() vehicle='${vehicle.name}'`;
+        const message = `getVehicleValues() vehicle='${ vehicle.name }'`;
         const fromDate = '2018-10-01';
         const toDate = '2018-10-02';
         const fromMS = +(new Date(fromDate));
         const toMS = +(new Date(toDate));
+        const dummy: IValue[] = [{
+            time: 123456,
+            soc: 7,
+            speed: 89,
+            current: 1011,
+            odo: 121314,
+            voltage: 15161718,
+        }];
 
         return new Promise((resolve, reject) => {
             const values = {};
@@ -102,11 +112,11 @@ export class VehiclesService {
                     callback => this._getVehicleStats(this.client, vehicle, 'voltage', fromMS, toMS, values, callback),
                 ], error => {
                     if (error) {
-                        this.logger.error(`${message} => NOK (${error.message})`);
+                        this.logger.error(`${ message } => NOK (${ error.message })`);
                         reject('NOK');
                     } else {
-                        this.logger.log(`${message} => OK`);
-                        resolve('OK');
+                        this.logger.log(`${ message } => OK`);
+                        resolve(this._convertValues(values));
                     }
                 },
             );
@@ -114,41 +124,6 @@ export class VehiclesService {
 
     }
 
-    // Private
-
-    _getVehicleStats(client: MongoClient, vehicle: IVehicle, attribute: string, fromMS: number, toMS: number,
-                     results: any, callback: (error: NodeJS.ErrnoException | null) => void) {
-        const collection = client
-            .db(vehicle.name)
-            .collection(attribute);
-
-        const source = unwindStream(collection, fromMS, toMS);
-
-        const sink = new Writable({
-            objectMode: true,
-            write(point, enc, cb) {
-                const { time, value } = point;
-                if (!results[ time ]) {
-                    results[ time ] = {};
-                    results[ time ].values = { soc: null, speed: null, current: null, odo: null, voltage: null };
-                }
-                results[ time ].values[ attribute ] = value;
-                cb();
-            },
-        });
-
-        pipeline([
-            source,
-            sink,
-        ], (error: NodeJS.ErrnoException | null) => {
-            if (error) {
-                this.logger.log(`getStats(${attribute}) => NOK (${error.message})`);
-            } else {
-                this.logger.log(`getStats(${attribute}) => OK`);
-            }
-            callback(error);
-        });
-    }
 
     // async getVehicleById(
     //     id: number,
@@ -177,7 +152,7 @@ export class VehiclesService {
         const result = await this.vehicleRepository.delete({ id, userId: user.id });
 
         if (result.affected === 0) {
-            throw new NotFoundException(`Vehicle with ID '${id}' not found`);
+            throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
         }
     }
 
@@ -191,4 +166,61 @@ export class VehiclesService {
     //     await vehicle.save();
     //     return vehicle;
     // }
+
+    // Private
+
+    _getVehicleStats(client: MongoClient, vehicle: IVehicle, attribute: string, fromMS: number, toMS: number,
+                     results: any, callback: (error: NodeJS.ErrnoException | null) => void) {
+        const collection = client
+            .db(vehicle.name)
+            .collection(attribute);
+
+        const source = unwindStream(collection, fromMS, toMS);
+
+        const sink = new Writable({
+            objectMode: true,
+            write(point, enc, cb) {
+                const { time, value } = point;
+                if (!results[time]) {
+                    results[time] = {};
+                    results[time].values = { soc: null, speed: null, current: null, odo: null, voltage: null };
+                }
+                results[time].values[attribute] = value;
+                cb();
+            },
+        });
+
+        pipeline([
+            source,
+            sink,
+        ], (error: NodeJS.ErrnoException | null) => {
+            if (error) {
+                this.logger.log(`getStats(${ attribute }) => NOK (${ error.message })`);
+            } else {
+                this.logger.log(`getStats(${ attribute }) => OK`);
+            }
+            callback(error);
+        });
+    }
+
+    _convertValues(values: any): IValue[] {
+        this.logger.log('_convertValues()');
+        const result: IValue[] = [];
+
+        Object.keys(values).sort().forEach(time => {
+            const next = values[time];
+            if (next) {
+                const v = next.values;
+                result.push({
+                    time: +time,
+                    soc: v.soc,
+                    speed: v.speed,
+                    current: v.current,
+                    odo: v.odo,
+                    voltage: v.voltage,
+                });
+            }
+        });
+        return result;
+    }
 }
