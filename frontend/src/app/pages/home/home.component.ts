@@ -18,7 +18,7 @@ import {
   dateYYYYMMDD,
   dateYYYYMMDDHH0000,
   dateYYYYMMDDHHMM00,
-  dateYYYYMMDDHHMMSS,
+  dateYYYYMMDDHHMMSS, exportToCsv,
 } from '../../lib/utils';
 
 type Unit = 'msec' | 'sec' | 'min' | 'hour' | 'day';
@@ -116,7 +116,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onDownload() {
-    console.log('onDownload() called');
+      const textarea = document.createElement('textarea');
+      document.body.appendChild(textarea);
+      textarea.value = exportToCsv(this._resetDataSource());
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
   }
 
   unitChanged(event: MatRadioChange) {
@@ -126,7 +131,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Private
 
-  _resetDataSource() {
+  _resetDataSource(): IValue[] {
     let filteredValues = this.values;
     if (this.currentUnit !== 'msec') {
       const filter = this.filters[this.currentUnit];
@@ -157,5 +162,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
     this.dataSource.data = filteredValues;
+    return filteredValues;
   }
 }
