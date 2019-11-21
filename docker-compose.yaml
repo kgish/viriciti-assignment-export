@@ -74,5 +74,25 @@ services:
     networks:
       - viriciti-network
 
+#  backend:
+#    image: redis:latest
+#    container_name: 'redis_cache'
+#    healthcheck:
+#      test: ["CMD", "redis-cli","ping"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 3
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#      mongo:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
+#    ports:
+#      - "3000:3000"
+#    networks:
+#      - viriciti-network
+
 networks:
   viriciti-network:
