@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
@@ -21,7 +21,6 @@ import {
 
 // --- PAGES --- //
 import {
-  AboutComponent,
   HomeComponent,
   LoginComponent,
   SignupComponent
@@ -32,9 +31,13 @@ import {
   FormatDatePipe
 } from './pipes';
 
+// --- INTERCEPTORS --- //
+import {
+  TokenInterceptor
+} from './interceptors';
+
 @NgModule({
   declarations: [
-    AboutComponent,
     AppComponent,
     FooterComponent,
     FormatDatePipe,
@@ -52,7 +55,9 @@ import {
     HttpClientModule,
     MaterialModule
   ],
-  providers: [],
+  providers: [
+    {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true}
+  ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule {

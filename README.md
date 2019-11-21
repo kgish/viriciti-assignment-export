@@ -6,13 +6,14 @@
 
 You will have to have the following installed.
 
-* Docker
-* Angular
-* Node
-* Nestjs
-* Postgres
-* Mongodb
-* Redis
+* docker
+* angular
+* node
+* nestjs
+* npm
+* postgres
+* mongodb
+* redis
 
 
 ## Installation
@@ -26,12 +27,46 @@ $ chmod +x ./init-all.sh
 $ ./init-all.sh
 ```
 
-There are three sub-directories:
+Verify that everything has been installed correctly by running the following tests.
 
-* frontend
-* backend
-* tooling
-* assignment
+```
+```
+
+There are five sub-directories:
+
+```
+.
+├── assignment
+├── backend
+├── data
+│   ├── db
+│   │   ├── mongo
+│   │   ├── mongo-test
+│   │   └── postgres
+│   └── dump
+├── frontend
+└── tooling
+```
+
+### assignment
+
+...
+
+### frontend
+
+...
+
+### backend
+
+...
+
+### tooling
+
+...
+
+### data
+
+...
 
 Convert Coffeescript to Typescript
 Where possible replace async with promises.
