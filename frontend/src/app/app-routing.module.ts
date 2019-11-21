@@ -3,7 +3,6 @@ import { Routes, RouterModule } from '@angular/router';
 
 // --- PAGES --- //
 import {
-  AboutComponent,
   HomeComponent,
   LoginComponent,
   SignupComponent
@@ -11,7 +10,6 @@ import {
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'about', component: AboutComponent },
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: '**', component: HomeComponent }

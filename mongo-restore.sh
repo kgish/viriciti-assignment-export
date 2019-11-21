@@ -8,7 +8,7 @@
 #
 # Description:
 #
-#     Restore mongo database from previous dump which is located at 'db/dump'
+#     Restore mongo database from previous dump which is located at 'data/dump'
 #     unless otherwise indicated.
 #
 #     By default will execute a dry run, unless the FORCE=true option is used.
@@ -21,7 +21,7 @@
 
 MONGO_USERNAME=${MONGO_USERNAME:-viriciti}
 MONGO_PASSWORD=${MONGO_PASSWORD:-viriciti}
-DUMPDIR=${DUMPDIR:-db/dump}
+DUMPDIR=${DUMPDIR:-data/dump}
 
 if [[ -z "${FORCE}" ]]; then
   DRYRUN="--dryRun"

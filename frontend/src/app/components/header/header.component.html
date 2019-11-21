@@ -8,6 +8,7 @@
   <div fxFlex fxLayout fxLayoutAlign="center center">
   </div>
   <div fxFlex fxLayout fxLayoutAlign="end center">
-    <a routerLink="about" matTooltip="Go to the about page">About</a>
+    <span *ngIf="!loggedIn"><mat-icon matTooltip="Please login first">lock</mat-icon></span>
+    <span *ngIf="loggedIn">{{user.name}}</span>
   </div>
 </mat-toolbar>

@@ -81,7 +81,28 @@ $ npm run start:dev
 ## API
 
 ```
+POST /signup
+{
+  name: kiffin
+  password: secret
+}
+...
+
+```
+
+```
+POST /login
+{
+  name: kiffin
+  password: secret
+}
+...
+
+```
+
+```
 GET /vehicles
+...
 [
   { "id": 1001, "name": "vehicle_001", "status": "READY" },
   { "id": 1002, "name": "vehicle_002", "status": "PARKED" },
@@ -92,11 +113,13 @@ GET /vehicles
 
 ```
 GET /vehicles/1003
+...
 { "id": 1003, "name": "vehicle_003", "status": "REPAIR" }
 ```
 
 ```
 GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
+...
 [
   {
     time: 1572562812345,

@@ -17,14 +17,16 @@
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput [min]="minDate" [max]="maxDate" formControlName="fromDate" [matDatepicker]="fromDate"
+        <label for="from-date"></label>
+        <input id="from-date" matInput [min]="minDate" [max]="maxDate" formControlName="fromDate" [matDatepicker]="fromDate"
                placeholder="From" readonly>
         <mat-datepicker-toggle matSuffix [for]="fromDate"></mat-datepicker-toggle>
         <mat-datepicker #fromDate [startAt]="minDate"></mat-datepicker>
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput [min]="minDate" [max]="maxDate" formControlName="toDate" [matDatepicker]="toDate"
+        <label for="to-date"></label>
+        <input id="to-date" matInput [min]="minDate" [max]="maxDate" formControlName="toDate" [matDatepicker]="toDate"
                placeholder="To" readonly>
         <mat-datepicker-toggle matSuffix [for]="toDate"></mat-datepicker-toggle>
         <mat-datepicker #toDate [startAt]="minDate"></mat-datepicker>
@@ -61,7 +63,7 @@
           <!-- Date column -->
           <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
-            <td mat-cell *matCellDef="let element">{{element.time | formatDate }}</td>
+            <td mat-cell *matCellDef="let element">{{element.time | formatDate:currentUnit }}</td>
           </ng-container>
 
           <!-- Time column -->
