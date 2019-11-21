@@ -22,7 +22,7 @@ import {
 // --- PAGES --- //
 import {
   HomeComponent,
-  LoginComponent,
+  SigninComponent,
   SignupComponent
 } from './pages';
 
@@ -43,7 +43,7 @@ import {
     FormatDatePipe,
     HeaderComponent,
     HomeComponent,
-    LoginComponent,
+    SigninComponent,
     SignupComponent
   ],
   imports: [
@@ -56,7 +56,7 @@ import {
     MaterialModule
   ],
   providers: [
-    {provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true}
+    { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
   ],
   bootstrap: [ AppComponent ]
 })

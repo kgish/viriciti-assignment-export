@@ -18,10 +18,10 @@ db:
       socketTimeoutMS: 5000
 
 rate-limiter:
-  type: Memory
+  type: 'Memory'
   points: 100
   duration: 60
-  keyPrefix: global
+  keyPrefix: 'global'
 
 jwt:
   expiresIn: 3600

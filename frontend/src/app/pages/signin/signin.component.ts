@@ -5,11 +5,11 @@ import { AuthService } from '../../services';
 import { getFormFieldError } from '../../lib/utils';
 
 @Component({
-  selector: 'app-signup',
-  templateUrl: './signup.component.html',
-  styleUrls: [ './signup.component.scss' ]
+  selector: 'app-signin',
+  templateUrl: './signin.component.html',
+  styleUrls: [ './signin.component.scss' ]
 })
-export class SignupComponent implements OnInit, AfterViewInit {
+export class SigninComponent implements OnInit, AfterViewInit {
 
   @ViewChild('username', { static: false }) username: ElementRef;
 
@@ -40,7 +40,7 @@ export class SignupComponent implements OnInit, AfterViewInit {
     const password = this.form.value.password;
     this.form.reset();
     [ 'username', 'password' ].forEach(f => this.form.controls[f].setErrors(null));
-    this.auth.signup(username, password);
+    this.auth.signin(username, password);
   }
 
   getError(field: string) {

@@ -28,6 +28,9 @@ export class HeaderComponent implements OnInit {
   }
 
   triggerToggleSidenav() {
+  }
 
+  signout() {
+    this.auth.signout();
   }
 }

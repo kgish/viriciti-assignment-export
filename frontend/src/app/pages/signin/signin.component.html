@@ -1,7 +1,7 @@
 <section fxLayoutAlign="center">
   <mat-card class="mat-elevation-z8">
     <mat-card-header fxLayoutAlign="center">
-      <mat-card-title>Signup</mat-card-title>
+      <mat-card-title>Signin</mat-card-title>
     </mat-card-header>
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <mat-card-content fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="10px">
@@ -28,7 +28,7 @@
       </mat-card-content>
       <mat-card-actions fxLayoutGap="20px" fxLayoutAlign="center center">
         <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">Submit</button>
-        <button routerLink="signin">Cancel</button>
+        <button mat-button routerLink="/signup">Signup</button>
       </mat-card-actions>
     </form>
   </mat-card>

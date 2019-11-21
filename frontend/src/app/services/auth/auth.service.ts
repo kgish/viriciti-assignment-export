@@ -4,15 +4,15 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { BehaviorSubject } from 'rxjs';
 
-interface ILoginRO {
+interface ISigninRO {
   user: {
     name: string;
   };
-  token: string;
+  accessToken: string;
 }
 
 export interface IUser {
-  name: string;
+  username: string;
 }
 
 @Injectable({
@@ -29,27 +29,45 @@ export class AuthService {
               private http: HttpClient) {
   }
 
-  login(username: string, password: string): void {
-    const url = 'http://localhost:3000/api/v1/login';
+  signin(username: string, password: string): void {
+    const url = '/api/auth/signin';
     this.http
-      .post(url, { username, password }).subscribe((data: ILoginRO) => {
-        // console.log(data);
-        this.user = data.user;
-        this.token.next(data.token);
-        this.snackbar.open('Login successful', 'X', { duration: 5000 });
+      .post(url, { username, password }).subscribe((data: ISigninRO) => {
+        this.user = { username };
+        this.token.next(data.accessToken);
+        this.snackbar.open('Signed in successfully', 'X', { duration: 5000 });
         this.router.navigate([ '/' ]);
       },
       error => {
         console.error(error);
-        this.snackbar.open('Invalid credential, please try again.', 'X', { duration: 5000 });
+        this.snackbar.open('Invalid credentials, please try again.', 'X', { duration: 5000 });
       });
   }
 
-  logout(): void {
+  signup(username: string, password: string): void {
+    const url = '/api/auth/signup';
+    this.http
+      .post(url, { username, password }).subscribe(() => {
+        this.snackbar.open('Signed up successfully, please login.', 'X', { duration: 5000 });
+        this.router.navigate([ '/signin' ]);
+      },
+      error => {
+        console.error(error);
+        const statusCode = error.statusCode;
+        const message = error.error;
+        if (JSON.stringify(error).match(/password too weak/)) {
+          this.snackbar.open('Password is too weak, please try again.', 'X', { duration: 5000 });
+        } else {
+          this.snackbar.open(`Oops, unexpected error (${statusCode} ${message})`, 'X', { duration: 5000 });
+        }
+      });
+  }
+
+  signout(): void {
     this.user = null;
     this.token.next(null);
-    this.snackbar.open('Logout successful', 'X', { duration: 5000 });
-    this.router.navigate([ '/login' ]);
+    this.snackbar.open('Signed out successfully', 'X', { duration: 5000 });
+    this.router.navigate([ '/signin' ]);
   }
 
   getUser(): IUser {

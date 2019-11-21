@@ -91,7 +91,7 @@ POST /signup
 ```
 
 ```
-POST /login
+POST /signin
 {
   name: kiffin
   password: secret

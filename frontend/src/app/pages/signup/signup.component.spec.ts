@@ -13,7 +13,7 @@ describe('SignupComponent', () => {
       declarations: [ SignupComponent ],
       imports: [ MaterialModule ]
     })
-      .compileComponents();
+    .compileComponents();
   }));
 
   beforeEach(() => {

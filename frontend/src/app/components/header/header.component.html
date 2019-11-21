@@ -3,12 +3,13 @@
     <button class="menu-button" type="button" aria-label="Toggle sidenav" mat-icon-button>
       <mat-icon class="menu-icon" (click)="triggerToggleSidenav()">menu</mat-icon>
     </button>
-    <h1><a routerLink="home" matTooltip="Go to the home page">{{title}}</a></h1>
+    <h1>{{title}}</h1>
   </div>
   <div fxFlex fxLayout fxLayoutAlign="center center">
   </div>
-  <div fxFlex fxLayout fxLayoutAlign="end center">
-    <span *ngIf="!loggedIn"><mat-icon matTooltip="Please login first">lock</mat-icon></span>
-    <span *ngIf="loggedIn">{{user.name}}</span>
+  <div fxFlex fxLayout fxLayoutGap="20px" fxLayoutAlign="end center">
+    <span *ngIf="!loggedIn"><mat-icon matTooltip="Please signin first">lock</mat-icon></span>
+    <span *ngIf="loggedIn">{{user.username}}</span>
+    <span *ngIf="loggedIn"><mat-icon class="signout" (click)="signout()" matTooltip="Click to signout">exit_to_app</mat-icon></span>
   </div>
 </mat-toolbar>
