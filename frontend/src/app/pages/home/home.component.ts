@@ -8,20 +8,26 @@ import {
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
+import { MatRadioChange } from '@angular/material/radio';
 import { Subscription } from 'rxjs';
 
-import { IValue, IVehicle, VehicleService } from '../../services';
-import { MatRadioChange } from '@angular/material/radio';
+import {
+  IValue,
+  IVehicle,
+  VehicleService
+} from '../../services';
+
 import {
   dateYYYY,
   dateYYYYMM,
   dateYYYYMMDD,
   dateYYYYMMDDHH0000,
   dateYYYYMMDDHHMM00,
-  dateYYYYMMDDHHMMSS, exportToCsv,
-} from '../../lib/utils';
+  dateYYYYMMDDHHMMSS,
+  exportToCsv
+} from '../../lib';
 
-type Unit = 'msec' | 'sec' | 'min' | 'hour' | 'day';
+import { Unit } from '../../global.types';
 
 @Component({
   selector: 'app-home',
@@ -73,7 +79,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.subscription = this.vehiclesService.getVehicles().subscribe(vehicles => {
       this.vehicles = vehicles;
-      this.form.get('vehicle').setValue(vehicles[0]);
+      this.form.get('vehicle').setValue(vehicles[ 0 ]);
     });
 
     this.form = this.fb.group({
@@ -101,7 +107,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const vehicle: IVehicle = this.form.value.vehicle;
     const fromDate: Date = this.form.value.fromDate;
     const toDate: Date = this.form.value.toDate;
-    console.log(`onSubmit() value='${ JSON.stringify(vehicle) }' fromDate='${ fromDate }' toDate='${ toDate }'`);
+    console.log(`onSubmit() value='${JSON.stringify(vehicle)}' fromDate='${fromDate}' toDate='${toDate}'`);
     this.loading = true;
     setTimeout(() => {
       this.vehiclesService.getVehicleValues(vehicle, fromDate, toDate)
@@ -116,12 +122,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onDownload() {
-      const textarea = document.createElement('textarea');
-      document.body.appendChild(textarea);
-      textarea.value = exportToCsv(this._resetDataSource());
-      textarea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textarea);
+    const vehicle: IVehicle = this.form.value.vehicle;
+    const fromDate: Date = this.form.value.fromDate;
+    const toDate: Date = this.form.value.toDate;
+    const textarea = document.createElement('textarea');
+    document.body.appendChild(textarea);
+    textarea.value = exportToCsv(this._resetDataSource(), vehicle.name, fromDate, toDate);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
   }
 
   unitChanged(event: MatRadioChange) {
@@ -134,23 +143,23 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   _resetDataSource(): IValue[] {
     let filteredValues = this.values;
     if (this.currentUnit !== 'msec') {
-      const filter = this.filters[this.currentUnit];
+      const filter = this.filters[ this.currentUnit ];
       const list = {};
       filteredValues = [];
       this.values.forEach(v => {
         const time = filter(new Date(v.time));
-        if (!list[time]) {
-          list[time] = { soc: 0, speed: 0, current: 0, odo: 0, voltage: 0 };
+        if (!list[ time ]) {
+          list[ time ] = { soc: 0, speed: 0, current: 0, odo: 0, voltage: 0 };
         }
-        list[time].time = time;
-        list[time].soc += v.soc;
-        list[time].speed += v.speed;
-        list[time].current += v.current;
-        list[time].odo += v.odo;
-        list[time].voltage += v.voltage;
+        list[ time ].time = time;
+        list[ time ].soc += v.soc;
+        list[ time ].speed += v.speed;
+        list[ time ].current += v.current;
+        list[ time ].odo += v.odo;
+        list[ time ].voltage += v.voltage;
       });
       Object.keys(list).sort().forEach(time => {
-        const v = list[time];
+        const v = list[ time ];
         filteredValues.push({
           time: v.time,
           soc: v.soc || '',
