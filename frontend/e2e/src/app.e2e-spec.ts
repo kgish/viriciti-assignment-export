@@ -10,7 +10,7 @@ describe('App', () => {
 
   it('should display correct title', () => {
     page.navigateTo();
-    expect(page.getTitleText()).toEqual('Viriciti Assignment | Exports');
+    expect(page.getTitleText()).toEqual('Assignment | Exports');
   });
 
   afterEach(async () => {

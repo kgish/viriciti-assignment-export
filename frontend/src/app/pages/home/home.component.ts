@@ -39,8 +39,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
   @ViewChild(MatSort, { static: true }) sort: MatSort;
 
-  @ViewChild('fromDate', { static: false }) fromTo;
-  @ViewChild('toDate', { static: false }) dateTo;
+  @ViewChild('fromDate', { static: false }) fromDatepicker;
+  @ViewChild('toDate', { static: false }) toDatepicker;
 
   form: FormGroup;
   vehicles: IVehicle[];

@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: [ './app.component.scss' ]
 })
 export class AppComponent {
-  title = 'Viriciti Assignment | Exports';
+  title = 'Assignment | Exports';
 }

@@ -1,13 +1,13 @@
 <h2>
   <mat-icon>home</mat-icon>
-  Home
+  Start
 </h2>
-<p>This is the home page.</p>
+<p>Time to do something fun and exciting.</p>
 
 <div class="mat-elevation-z2">
 
   <div class="header-row">
-    <form [formGroup]="form" fxLayout fxLayoutGap="10px" fxLayoutAlign="space-between center">
+    <form [formGroup]="form" fxLayout fxLayoutGap="10px" fxLayoutAlign="space-between center" (ngSubmit)="onSubmit()">
       <mat-form-field>
         <mat-select formControlName="vehicle" placeholder="Vehicle">
           <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle">
@@ -18,7 +18,8 @@
 
       <mat-form-field>
         <label for="from-date"></label>
-        <input id="from-date" matInput [min]="minDate" [max]="maxDate" formControlName="fromDate" [matDatepicker]="fromDate"
+        <input id="from-date" matInput [min]="minDate" [max]="maxDate" formControlName="fromDate"
+               [matDatepicker]="fromDate"
                placeholder="From" readonly>
         <mat-datepicker-toggle matSuffix [for]="fromDate"></mat-datepicker-toggle>
         <mat-datepicker #fromDate [startAt]="minDate"></mat-datepicker>
@@ -40,7 +41,7 @@
       </mat-radio-group>
 
       <div fxLayout fxLayoutGap="10px">
-        <button mat-raised-button color="primary" [disabled]="form.invalid" (click)="onSubmit()">Submit</button>
+        <button mat-raised-button type="submit" [disabled]="form.invalid">Submit</button>
         <button mat-raised-button color="secondary" [disabled]="!values || !values.length" (click)="onDownload()">
           Download
         </button>

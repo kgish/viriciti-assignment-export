@@ -1,18 +1,33 @@
 .mat-toolbar {
-  background-color: #617E4E;
+  background-color: #7CA363;
+  height: 52px;
   color: #fff;
-  border-bottom: 2px solid #000;
+  border-bottom: 2px solid darkgray;
 }
 
-.mat-icon {
-  //color: #fff;
-}
-
-.menu-button {
-  margin-right: 15px;
+.logo {
+  height: 26px;
 }
 
 .signout {
   margin-top: 10px;
   cursor: pointer;
 }
+
+.navigation-items {
+  .menu-account {
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .user-name {
+    font-size: 16px;
+    padding-left: 10px;
+  }
+}
+
+.menu {
+  color: #617E4E;
+  margin-right: 10px;
+}
+

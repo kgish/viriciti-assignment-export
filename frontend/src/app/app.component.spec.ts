@@ -31,9 +31,9 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'Viriciti Assignment | Exports'`, () => {
+  it(`should have as title 'Assignment | Exports'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('Viriciti Assignment | Exports');
+    expect(app.title).toEqual('Assignment | Exports');
   });
 });
