@@ -15,6 +15,9 @@ export interface IUser {
   username: string;
 }
 
+const LOCAL_STORAGE_ACCESS_TOKEN = 'viriciti-access-token';
+const LOCAL_STORAGE_USERNAME = 'viriciti-user';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,6 +30,13 @@ export class AuthService {
               private snackbar: MatSnackBar,
               private dialog: MatDialog,
               private http: HttpClient) {
+
+    const accessToken = localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN);
+    if (accessToken) {
+      this.token.next(accessToken);
+      const username = localStorage.getItem(LOCAL_STORAGE_USERNAME) || 'Unknown';
+      this.user = { username };
+    }
   }
 
   signin(username: string, password: string): void {
@@ -35,6 +45,8 @@ export class AuthService {
       .post(url, { username, password }).subscribe((data: ISigninRO) => {
         this.user = { username };
         this.token.next(data.accessToken);
+        localStorage.setItem(LOCAL_STORAGE_USERNAME, username);
+        localStorage.setItem(LOCAL_STORAGE_ACCESS_TOKEN, data.accessToken);
         this.snackbar.open('Signed in successfully', 'X', { duration: 5000 });
         this.router.navigate([ '/' ]);
       },
@@ -58,7 +70,7 @@ export class AuthService {
         if (JSON.stringify(error).match(/password too weak/)) {
           this.snackbar.open('Password is too weak, please try again.', 'X', { duration: 5000 });
         } else {
-          this.snackbar.open(`Oops, unexpected error (${statusCode} ${message})`, 'X', { duration: 5000 });
+          this.snackbar.open(`Oops, unexpected error (${ statusCode } ${ message })`, 'X', { duration: 5000 });
         }
       });
   }
@@ -66,6 +78,8 @@ export class AuthService {
   signout(): void {
     this.user = null;
     this.token.next(null);
+    localStorage.removeItem(LOCAL_STORAGE_USERNAME);
+    localStorage.removeItem(LOCAL_STORAGE_ACCESS_TOKEN);
     this.snackbar.open('Signed out successfully', 'X', { duration: 5000 });
     this.router.navigate([ '/signin' ]);
   }

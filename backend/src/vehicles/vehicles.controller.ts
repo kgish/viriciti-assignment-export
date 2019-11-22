@@ -1,30 +1,30 @@
 import {
-    Body,
+    // Body,
     Controller,
-    Delete,
+    // Delete,
     Get,
     Logger,
     Param,
     ParseIntPipe,
-    Patch,
-    Post,
+    // Patch,
+    // Post,
     Query,
     UseGuards,
-    UsePipes,
+    // UsePipes,
     ValidationPipe,
 } from '@nestjs/common';
 import { IValue, IVehicle, VehiclesService } from './vehicles.service';
-import { CreateVehicleDto } from './dto/create-vehicle.dto';
-import { VehicleStatusValidationPipe } from './pipes/vehicle-status-validation.pipe';
+// import { CreateVehicleDto } from './dto/create-vehicle.dto';
+// import { VehicleStatusValidationPipe } from './pipes/vehicle-status-validation.pipe';
 import { GetVehiclesFilterDto } from './dto/get-vehicles-filter.dto';
-import { Vehicle } from './vehicle.entity';
-import { VehicleStatus } from './vehicle-status.enum';
+// import { Vehicle } from './vehicle.entity';
+// import { VehicleStatus } from './vehicle-status.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../auth/get-user.decorator';
 import { User } from '../auth/user.entity';
 
 @Controller('vehicles')
-// @UseGuards(AuthGuard())
+@UseGuards(AuthGuard())
 export class VehiclesController {
 
     private logger = new Logger('VehiclesController');
