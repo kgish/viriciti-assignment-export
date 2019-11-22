@@ -23,6 +23,8 @@
     "@angular/platform-browser": "~8.2.13",
     "@angular/platform-browser-dynamic": "~8.2.13",
     "@angular/router": "~8.2.13",
+    "@types/chart.js": "^2.9.2",
+    "chart.js": "^2.9.3",
     "export-to-csv": "^0.2.1",
     "hammerjs": "^2.0.8",
     "rxjs": "~6.4.0",

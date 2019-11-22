@@ -11,6 +11,8 @@ import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
 import { MatRadioChange } from '@angular/material/radio';
 import { Subscription } from 'rxjs';
 
+import { Chart, ChartOptions } from 'chart.js';
+
 import {
   IValue,
   IVehicle,
@@ -71,6 +73,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     sec: dateYYYYMMDDHHMMSS,
   };
 
+  socChart: Chart;
+  speedChart: Chart;
+  currentChart: Chart;
+  odoChart: Chart;
+  voltageChart: Chart;
+
   private subscription: Subscription;
 
   constructor(private vehiclesService: VehicleService,
@@ -81,7 +89,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     this.subscription = this.vehiclesService.getVehicles().subscribe(vehicles => {
       this.vehicles = vehicles;
-      this.form.get('vehicle').setValue(vehicles[ 0 ]);
+      this.form.get('vehicle').setValue(vehicles[0]);
     });
 
     this.form = this.fb.group({
@@ -98,6 +106,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.form.get('fromDate').setValue(this.minDate);
       this.form.get('toDate').setValue(this.minDate2);
+      this._initCharts();
     }, 200);
   }
 
@@ -109,7 +118,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const vehicle: IVehicle = this.form.value.vehicle;
     const fromDate: Date = this.form.value.fromDate;
     const toDate: Date = this.form.value.toDate;
-    console.log(`onSubmit() value='${JSON.stringify(vehicle)}' fromDate='${fromDate}' toDate='${toDate}'`);
+    console.log(`onSubmit() value='${ JSON.stringify(vehicle) }' fromDate='${ fromDate }' toDate='${ toDate }'`);
     this.loading = true;
     const tm = +(new Date());
     setTimeout(() => {
@@ -117,7 +126,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe(values => {
             this.values = values;
             this._resetDataSource();
-            this.snackbar.open(`Fetched ${values.length} records in ${+(new Date()) - tm} msecs.`, 'X', { duration: 5000 });
+            this.snackbar.open(`Fetched ${ values.length } records in ${ +(new Date()) - tm } msecs.`, 'X', { duration: 5000 });
           },
           error => console.log(error),
           () => this.loading = false);
@@ -147,23 +156,23 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   _resetDataSource(): IValue[] {
     let filteredValues = this.values;
     if (this.currentUnit !== 'msec') {
-      const filter = this.filters[ this.currentUnit ];
+      const filter = this.filters[this.currentUnit];
       const list = {};
       filteredValues = [];
       this.values.forEach(v => {
         const time = filter(new Date(v.time));
-        if (!list[ time ]) {
-          list[ time ] = { soc: 0, speed: 0, current: 0, odo: 0, voltage: 0 };
+        if (!list[time]) {
+          list[time] = { soc: 0, speed: 0, current: 0, odo: 0, voltage: 0 };
         }
-        list[ time ].time = time;
-        list[ time ].soc += v.soc;
-        list[ time ].speed += v.speed;
-        list[ time ].current += v.current;
-        list[ time ].odo += v.odo;
-        list[ time ].voltage += v.voltage;
+        list[time].time = time;
+        list[time].soc += v.soc;
+        list[time].speed += v.speed;
+        list[time].current += v.current;
+        list[time].odo += v.odo;
+        list[time].voltage += v.voltage;
       });
       Object.keys(list).sort().forEach(time => {
-        const v = list[ time ];
+        const v = list[time];
         filteredValues.push({
           time: v.time,
           soc: v.soc || '',
@@ -176,5 +185,49 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.dataSource.data = filteredValues;
     return filteredValues;
+  }
+
+  _initCharts() {
+
+    const type = 'line';
+    const options: ChartOptions = {
+      responsive: true,
+      legend: {
+        position: 'right'
+      }
+    };
+
+    this.socChart = new Chart('soc-chart', {
+      type,
+      data: {
+        labels: [],
+        datasets: [ {
+          data: [ { x: 10, y: 20 }, { x: 20, y: 10 }, { x: 30, y: 50 } ]
+        } ]
+      },
+      options
+    });
+
+    this.speedChart = new Chart('speed-chart', {
+      type,
+      data: {},
+      options
+    });
+
+    this.currentChart = new Chart('current-chart', {
+      type,
+      options
+    });
+
+    this.odoChart = new Chart('odo-chart', {
+      type,
+      options
+    });
+
+    this.voltageChart = new Chart('voltage-chart', {
+      type,
+      data: {},
+      options
+    });
   }
 }
