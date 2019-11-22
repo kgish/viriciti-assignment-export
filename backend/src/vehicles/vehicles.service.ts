@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MongoClient } from 'mongodb';
+import { RedisClient } from 'redis';
 import { pipeline, Writable } from 'stream';
 import { parallel } from 'async';
 
@@ -10,6 +11,7 @@ import { VehicleRepository } from './vehicle.repository';
 // import { VehicleStatus } from './vehicle-status.enum';
 import { Vehicle } from './vehicle.entity';
 import { mongoConfig } from '../config/mongodb.config';
+import { redisConfig } from '../config/redis.config';
 import { User } from '../auth/user.entity';
 
 import { unwindStream } from '../lib/unwind.stream';
@@ -32,7 +34,8 @@ export interface IValue {
 export class VehiclesService {
 
     private logger = new Logger('VehiclesService');
-    private client: MongoClient;
+    private mongoClient: MongoClient;
+    private redisClient: RedisClient;
 
     private vehicles: IVehicle[] = [
         { id: 1001, name: 'vehicle_001' },
@@ -44,15 +47,27 @@ export class VehiclesService {
         @InjectRepository(VehicleRepository)
         private vehicleRepository: VehicleRepository,
     ) {
+        // Connect to MongoDB
+        this.logger.log(`mongoConfig='${ JSON.stringify(mongoConfig) }'`);
         const uri = `mongodb://${ mongoConfig.username }:${ mongoConfig.password }@${ mongoConfig.host }:${ mongoConfig.port }`;
         MongoClient.connect(uri, mongoConfig.settings, (error, client) => {
             if (error) {
                 this.logger.error(`Cannot connect to mongo, error='${ error.message }'`);
             } else {
                 this.logger.log(`Connected to mongo database`);
-                this.client = client;
+                this.mongoClient = client;
             }
         });
+
+        // Connect to Redis
+        this.logger.log(`redisConfig='${ JSON.stringify(redisConfig) }'`);
+
+        try {
+            this.redisClient = new RedisClient(redisConfig);
+            this.logger.log(`Connected to redis cache`);
+        } catch (error) {
+            this.logger.error(`Cannot connect to redis, error='${ error.message }'`);
+        }
     }
 
     getVehicles(
@@ -99,11 +114,11 @@ export class VehiclesService {
             const values = {};
 
             parallel([
-                    callback => this._getVehicleStats(this.client, vehicle, 'soc', fromMS, toMS, values, callback),
-                    callback => this._getVehicleStats(this.client, vehicle, 'speed', fromMS, toMS, values, callback),
-                    callback => this._getVehicleStats(this.client, vehicle, 'current', fromMS, toMS, values, callback),
-                    callback => this._getVehicleStats(this.client, vehicle, 'odo', fromMS, toMS, values, callback),
-                    callback => this._getVehicleStats(this.client, vehicle, 'voltage', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'soc', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'speed', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'current', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'odo', fromMS, toMS, values, callback),
+                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'voltage', fromMS, toMS, values, callback),
                 ], error => {
                     if (error) {
                         this.logger.error(`${ message } => NOK (${ error.message })`);
@@ -201,7 +216,7 @@ export class VehiclesService {
         const result: IValue[] = [];
         const times = Object.keys(values).sort();
 
-        this.logger.log(`_convertValues() times=${times.length}`);
+        this.logger.log(`_convertValues() times=${ times.length }`);
 
         times.forEach(time => {
             const next = values[time];

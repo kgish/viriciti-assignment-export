@@ -60,8 +60,10 @@ services:
       - viriciti-network
 
   redis:
-    image: redis:latest
+    image: bitnami/redis:latest
     container_name: 'redis_cache'
+    environment:
+      REDIS_PASSWORD: 'viriciti'
     healthcheck:
         test: ["CMD", "redis-cli","ping"]
         interval: 10s
@@ -71,6 +73,7 @@ services:
       - /data/db/redis
     ports:
       - "6379:6379"
+    restart: always
     networks:
       - viriciti-network
 

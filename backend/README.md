@@ -59,6 +59,13 @@ MONGO_SETTINGS_USE_UNIFIED_TOPOLOGY
 MONGO_SETTINGS_CONNECT_TIMEOUT_MS
 MONGO_SETTINGS_SOCKET_TIMEOUT_MS
 
+# Redis
+REDIS_HOSTNAME
+REDIS_PORT
+REDIS_DB
+REDIS_PASSWORD
+REDIS_PREFIX
+
 # Rate limiter
 RATE_LIMITER_TYPE
 RATE_LIMITER_POINTS
@@ -166,4 +173,11 @@ GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
 * [NestJS](https://nestjs.com)
 * [TypeORM](https://typeorm.io)
 * [Jest](https://jestjs.io)
-* [node-rate-limiter-flexible](https://github.com/animir/node-rate-limiter-flexible)
+* [Node Rate Limiter](https://github.com/animir/node-rate-limiter-flexible)
+* [Redis for NestJS](https://docs.nestjs.com/microservices/redis)
+* [Caching a MongoDB Database with Redis](https://codeforgeek.com/caching-a-mongodb-database-with-redis)
+* [Docker](https://www.docker.com)
+* Docker Hub
+    * [Postgres](https://hub.docker.com/_/postgres)
+    * [Mongo](https://hub.docker.com/_/mongo)
+    * [Redis](https://hub.docker.com/_/redis)

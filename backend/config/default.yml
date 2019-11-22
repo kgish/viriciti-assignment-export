@@ -17,6 +17,14 @@ db:
       connectTimeoutMS: 5000
       socketTimeoutMS: 5000
 
+redis:
+  type: 'redis'
+  host: 'localhost'
+  port: 6379
+  db: 1
+  password: 'viriciti'
+  prefix: ''
+
 rate-limiter:
   type: 'Memory'
   points: 100

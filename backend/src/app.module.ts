@@ -10,6 +10,7 @@ import { VehiclesModule } from './vehicles/vehicles.module';
 import { VerifyTokenModule } from './verify-token/verify-token.module';
 
 import { typeOrmConfig } from './config/typeorm.config';
+import { redisConfig } from './config/redis.config';
 import { rateLimiterConfig } from './config/rate-limiter.config';
 
 @Module({
