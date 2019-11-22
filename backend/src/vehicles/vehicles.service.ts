@@ -61,7 +61,6 @@ export class VehiclesService {
 
         // Connect to Redis
         this.logger.log(`redisConfig='${ JSON.stringify(redisConfig) }'`);
-
         try {
             this.redisClient = new RedisClient(redisConfig);
             this.logger.log(`Connected to redis cache`);
@@ -99,53 +98,57 @@ export class VehiclesService {
         toDate: string,
     ): Promise<any> {
         const vehicle = this.vehicles.find(v => v.id === +id);
+        const prefix = `getVehicleValues() vehicle='${ vehicle.name }'`;
 
         if (!vehicle) {
             throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
         }
 
-        const message = `getVehicleValues() vehicle='${ vehicle.name }'`;
-        // const fromDate = '2018-10-01';
-        // const toDate = '2018-10-02';
         const fromMS = +(new Date(fromDate));
         const toMS = +(new Date(toDate));
 
         return new Promise((resolve, reject) => {
-            const values = {};
 
-            parallel([
-                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'soc', fromMS, toMS, values, callback),
-                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'speed', fromMS, toMS, values, callback),
-                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'current', fromMS, toMS, values, callback),
-                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'odo', fromMS, toMS, values, callback),
-                    callback => this._getVehicleStats(this.mongoClient, vehicle, 'voltage', fromMS, toMS, values, callback),
-                ], error => {
-                    if (error) {
-                        this.logger.error(`${ message } => NOK (${ error.message })`);
-                        reject('NOK');
+            const rid = `${ vehicle.name }.${ fromDate.replace('-', '') }.${ toDate.replace('-', '') }`;
+            this.redisClient.get(rid, (err, reply) => {
+                if (err) {
+                    this.logger.log(`${ prefix } rid='${ rid }' error='${ JSON.stringify(err) }'`);
+                } else {
+                    if (reply) {
+                        this.logger.log(`${ prefix } rid='${ rid }' => HIT`);
+                        resolve(JSON.parse(reply));
                     } else {
-                        this.logger.log(`${ message } => OK`);
-                        resolve(this._convertValues(values));
+                        this.logger.log(`${ prefix } rid='${ rid }' => MISS`);
                     }
-                },
-            );
+                }
+
+                if (err || !reply) {
+
+                    const values = {};
+
+                    parallel([
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'soc', fromMS, toMS, values, callback),
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'speed', fromMS, toMS, values, callback),
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'current', fromMS, toMS, values, callback),
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'odo', fromMS, toMS, values, callback),
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'voltage', fromMS, toMS, values, callback),
+                        ], error => {
+                            if (error) {
+                                this.logger.error(`${ prefix } => NOK (${ error.message })`);
+                                reject('NOK');
+                            } else {
+                                this.logger.log(`${ prefix } => OK`);
+                                const converted = this._convertValues(values);
+                                this.redisClient.set(rid, JSON.stringify(converted));
+                                resolve(converted);
+                            }
+                        },
+                    );
+                }
+            });
         });
 
     }
-
-
-    // async getVehicleById(
-    //     id: number,
-    //     user: User,
-    // ): Promise<Vehicle> {
-    //     const found = await this.vehicleRepository.findOne({ where: { id, userId: user.id } });
-    //
-    //     if (!found) {
-    //         throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
-    //     }
-    //
-    //     return found;
-    // }
 
     async createVehicle(
         createVehicleDto: CreateVehicleDto,

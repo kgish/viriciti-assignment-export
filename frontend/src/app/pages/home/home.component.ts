@@ -117,7 +117,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe(values => {
             this.values = values;
             this._resetDataSource();
-            this.snackbar.open(`Processed ${values.length} records in ${+(new Date()) - tm} msecs.`, 'X', { duration: 5000 });
+            this.snackbar.open(`Fetched ${values.length} records in ${+(new Date()) - tm} msecs.`, 'X', { duration: 5000 });
           },
           error => console.log(error),
           () => this.loading = false);
