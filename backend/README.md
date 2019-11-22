@@ -80,26 +80,37 @@ $ npm run start:dev
 
 ## API
 
+The API is relatively simple and consists of the following calls:
+
+## Health check
+```
+GET /health-check
+```
+
+## Verify token
+```
+GET /health-check
+```
+
+## Sign up new user
 ```
 POST /signup
 {
   name: kiffin
   password: secret
 }
-...
-
 ```
 
+## Login
 ```
 POST /signin
 {
   name: kiffin
   password: secret
 }
-...
-
 ```
 
+## Get all vehicles
 ```
 GET /vehicles
 ...
@@ -111,12 +122,14 @@ GET /vehicles
 ]
 ```
 
+## Get one vehicle
 ```
 GET /vehicles/1003
 ...
 { "id": 1003, "name": "vehicle_003", "status": "REPAIR" }
 ```
 
+## Get values within date range for one vehicle
 ```
 GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
 ...

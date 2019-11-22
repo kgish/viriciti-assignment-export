@@ -18,6 +18,8 @@ export interface IUser {
 const LOCAL_STORAGE_ACCESS_TOKEN = 'viriciti-access-token';
 const LOCAL_STORAGE_USERNAME = 'viriciti-user';
 
+const fn = 'AuthService';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,15 +33,11 @@ export class AuthService {
               private dialog: MatDialog,
               private http: HttpClient) {
 
-    const accessToken = localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN);
-    if (accessToken) {
-      this.token.next(accessToken);
-      const username = localStorage.getItem(LOCAL_STORAGE_USERNAME) || 'Unknown';
-      this.user = { username };
-    }
+    this._init().then(() => console.log(`${ fn } initialized`));
   }
 
   signin(username: string, password: string): void {
+    console.log(`${ fn } signin() username='${ username }' password='*****'`);
     const url = '/api/auth/signin';
     this.http
       .post(url, { username, password }).subscribe((data: ISigninRO) => {
@@ -57,6 +55,7 @@ export class AuthService {
   }
 
   signup(username: string, password: string): void {
+    console.log(`${ fn } signup() username='${ username }' password='*****'`);
     const url = '/api/auth/signup';
     this.http
       .post(url, { username, password }).subscribe(() => {
@@ -75,16 +74,78 @@ export class AuthService {
       });
   }
 
-  signout(): void {
+  signout(b: boolean = true): void {
+    console.log(`${ fn } signout(${ b })`);
     this.user = null;
     this.token.next(null);
     localStorage.removeItem(LOCAL_STORAGE_USERNAME);
     localStorage.removeItem(LOCAL_STORAGE_ACCESS_TOKEN);
-    this.snackbar.open('Signed out successfully', 'X', { duration: 5000 });
+    if (b) {
+      this.snackbar.open('Signed out successfully', 'X', { duration: 5000 });
+    }
     this.router.navigate([ '/signin' ]);
   }
 
   getUser(): IUser {
     return this.user;
   }
+
+  // Private
+
+  async _init() {
+    const accessToken = localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN);
+    if (accessToken) {
+      this.token.next(accessToken);
+      const username = localStorage.getItem(LOCAL_STORAGE_USERNAME) || 'Unknown';
+      this.user = { username };
+    }
+
+    // // First check and make sure that the backend is up and running
+    // if (await this._healthCheck()) {
+    //
+    //   const accessToken = localStorage.getItem(LOCAL_STORAGE_ACCESS_TOKEN);
+    //   this.token.next(accessToken);
+    //
+    //   // Verify that the token is still valid
+    //   if (await this._verifyToken()) {
+    //     const username = localStorage.getItem(LOCAL_STORAGE_USERNAME) || 'Unknown';
+    //     this.user = { username };
+    //   } else {
+    //     this.signout(false);
+    //   }
+    // }
+  }
+
+  // async _healthCheck(): Promise<boolean> {
+  //   return new Promise((resolve, reject) => {
+  //     const url = '/api/health-check';
+  //     this.http.get(url).subscribe(
+  //       () => {
+  //         console.log(`${ fn } _healthCheck() server is available`);
+  //         resolve(true);
+  //       },
+  //       error => {
+  //         console.log(`${ fn } _healthCheck() server is unavailable error='${ JSON.stringify(error) }'`);
+  //         this.snackbar.open('Server is unavailable, please try again later', 'X', { duration: 5000 });
+  //         reject(error);
+  //       }
+  //     );
+  //   });
+  // }
+
+  // async _verifyToken(): Promise<boolean> {
+  //   return new Promise((resolve, reject) => {
+  //     const url = '/api/verify-token';
+  //     this.http.get(url).subscribe(
+  //       () => {
+  //         console.log(`${ fn } _verifyToken() => OK`);
+  //         resolve(true);
+  //       },
+  //       error => {
+  //         console.log(`${ fn } _verifyToken() => NOK error='${ JSON.stringify(error) }'`);
+  //         reject(error);
+  //       }
+  //     );
+  //   });
+  // }
 }

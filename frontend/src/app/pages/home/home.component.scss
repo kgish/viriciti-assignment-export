@@ -1,6 +1,7 @@
 h2 {
   color: #7CA363;
 }
+
 form {
   padding: 10px;
   width: 100%;
@@ -8,6 +9,7 @@ form {
 
 table {
   width: 100%;
+
   th,
   td {
     padding-left: 0.5rem;
@@ -34,4 +36,17 @@ button[type=submit] {
 mat-icon {
   color: #7CA363;
   font-weight: bold;
+}
+
+.mat-radio-button.mat-radio-checked .mat-radio-outer-circle {
+  border-color: #7CA363;
+}
+
+.mat-radio-button .mat-radio-inner-circle {
+  color: #7CA363;
+  background-color: #7CA363;
+}
+
+.mat-radio-button .mat-radio-ripple .mat-ripple-element {
+  background-color: #7CA363;
 }
