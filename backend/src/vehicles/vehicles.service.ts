@@ -15,6 +15,7 @@ import { redisConfig } from '../config/redis.config';
 import { User } from '../auth/user.entity';
 
 import { unwindStream } from '../lib/unwind.stream';
+import { dateYYYYMMDD } from '../../../frontend/src/app/lib/utils';
 
 export interface IVehicle {
     id: number;
@@ -29,6 +30,8 @@ export interface IValue {
     odo: number;
     voltage: number;
 }
+
+const MSECS_PER_DAY = (1000 * 60 * 60 * 24);
 
 @Injectable()
 export class VehiclesService {
@@ -106,6 +109,25 @@ export class VehiclesService {
 
         const fromMS = +(new Date(fromDate));
         const toMS = +(new Date(toDate));
+
+        let blocks: any[];
+        // let blocks: [ { fromDate: string, toDate: string } ];
+        const days = (toMS - fromMS) / MSECS_PER_DAY;
+        this.logger.log(`${ prefix } days='${ days }'`);
+
+        if (days === 1) {
+            blocks = [ { fromDate, toDate } ];
+        } else {
+            blocks = [];
+            for (let t = fromMS; t < toMS; t += MSECS_PER_DAY) {
+                blocks.push({
+                    fromDate: dateYYYYMMDD(new Date(t)),
+                    toDate: dateYYYYMMDD(new Date(t + MSECS_PER_DAY)),
+                });
+            }
+        }
+
+        this.logger.log(`${ prefix } blocks='${ JSON.stringify(blocks) }'`);
 
         return new Promise((resolve, reject) => {
 
