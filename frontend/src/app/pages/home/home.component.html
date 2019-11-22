@@ -117,7 +117,7 @@
           <mat-icon class="tab-icon">pie_chart</mat-icon>
           Charts
         </ng-template>
-        <mat-tab-group>
+        <mat-tab-group (selectedIndexChange)="selectedIndexChange($event)" animationDuration="0">
           <mat-tab>
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">flag</mat-icon>
@@ -145,7 +145,7 @@
               <canvas id="current-chart">{{ currentChart }}</canvas>
             </div>
           </mat-tab>
-          <mat-tab>
+            <mat-tab>
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">dashboard</mat-icon>
               Odo

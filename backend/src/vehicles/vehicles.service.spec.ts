@@ -6,8 +6,8 @@ import { VehicleStatus } from './vehicle-status.enum';
 import { NotFoundException } from '@nestjs/common';
 
 describe('VehicleService', () => {
-    let tasksService;
-    let taskRepository;
+    let vehiclesService;
+    let vehicleRepository;
 
     const mockUser = { id: 12, username: 'Test user' };
 
@@ -26,82 +26,82 @@ describe('VehicleService', () => {
             ],
         }).compile();
 
-        tasksService = await module.get<VehiclesService>(VehiclesService);
-        taskRepository = await module.get<VehicleRepository>(VehicleRepository);
+        vehiclesService = await module.get<VehiclesService>(VehiclesService);
+        vehicleRepository = await module.get<VehicleRepository>(VehicleRepository);
     });
 
     describe('getVehicles', () => {
-        it('gets all tasks from repository', async () => {
-            taskRepository.getVehicles.mockResolvedValue('someValue');
+        it('gets all vehicless from repository', async () => {
+            vehicleRepository.getVehicles.mockResolvedValue('someValue');
 
-            expect(taskRepository.getVehicles).not.toHaveBeenCalled();
+            expect(vehicleRepository.getVehicles).not.toHaveBeenCalled();
 
             const filters: GetVehiclesFilterDto = { status: VehicleStatus.READY, search: 'Something to search' };
-            const result = await tasksService.getVehicles(filters, mockUser);
-            tasksService.getVehicles(filters, mockUser);
-            expect(taskRepository.getVehicles).toHaveBeenCalled();
+            const result = await vehiclesService.getVehicles(filters, mockUser);
+            vehiclesService.getVehicles(filters, mockUser);
+            expect(vehicleRepository.getVehicles).toHaveBeenCalled();
             expect(result).toEqual('someValue');
         });
     });
 
     describe('getVehiclesById', () => {
-        it('calls taskRepository.findOne() and successfully retrieve and return the task', async () => {
-            const mockVehicle = { title: 'Test task', description: 'Vehicle description' };
-            taskRepository.findOne.mockResolvedValue(mockVehicle);
+        it('calls vehicleRepository.findOne() and successfully retrieve and return the vehicle', async () => {
+            const mockVehicle = { title: 'Test vehicle', description: 'Vehicle description' };
+            vehicleRepository.findOne.mockResolvedValue(mockVehicle);
 
-            const result = await tasksService.getVehicleById(1, mockUser);
+            const result = await vehiclesService.getVehicleById(1, mockUser);
             expect(result).toEqual(mockVehicle);
 
-            expect(taskRepository.findOne).toHaveBeenCalledWith({ where: { id: 1, userId: mockUser.id } });
+            expect(vehicleRepository.findOne).toHaveBeenCalledWith({ where: { id: 1, userId: mockUser.id } });
 
         });
 
-        it('throws as error if task not found', () => {
-            taskRepository.findOne.mockResolvedValue(null);
-            expect(tasksService.getVehicleById(1, mockUser)).rejects.toThrow(NotFoundException);
+        it('throws as error if vehicle not found', () => {
+            vehicleRepository.findOne.mockResolvedValue(null);
+            expect(vehiclesService.getVehicleById(1, mockUser)).rejects.toThrow(NotFoundException);
         });
     });
 
     describe('createVehicle', () => {
 
-        it('calls taskRepository.createVehicle() and returns the result', async () => {
+        it('calls vehicleRepository.createVehicle() and returns the result', async () => {
             const createVehicleDTO = { title: 'Vehicle title', description: 'Vehicle description' };
-            taskRepository.createVehicle.mockResolvedValue('someValue');
-            expect(taskRepository.createVehicle).not.toHaveBeenCalled();
-            const result = await tasksService.createVehicle(createVehicleDTO, mockUser);
-            expect(taskRepository.createVehicle).toHaveBeenCalledWith(createVehicleDTO, mockUser);
+            vehicleRepository.createVehicle.mockResolvedValue('someValue');
+            expect(vehicleRepository.createVehicle).not.toHaveBeenCalled();
+            const result = await vehiclesService.createVehicle(createVehicleDTO, mockUser);
+            expect(vehicleRepository.createVehicle).toHaveBeenCalledWith(createVehicleDTO, mockUser);
             expect(result).toEqual('someValue');
         });
     });
 
     describe('deleteVehicle', () => {
 
-        it('calls taskRepository.deleteVehicle() and returns the result', async () => {
-            taskRepository.delete.mockResolvedValue({ affected: 1 });
-            expect(taskRepository.delete).not.toHaveBeenCalled();
-            await tasksService.deleteVehicle(1, mockUser);
-            expect(taskRepository.delete).toHaveBeenCalledWith({ id: 1, userId: mockUser.id });
+        it('calls vehicleRepository.deleteVehicle() and returns the result', async () => {
+            vehicleRepository.delete.mockResolvedValue({ affected: 1 });
+            expect(vehicleRepository.delete).not.toHaveBeenCalled();
+            await vehiclesService.deleteVehicle(1, mockUser);
+            expect(vehicleRepository.delete).toHaveBeenCalledWith({ id: 1, userId: mockUser.id });
         });
 
-        it('throws as error if task not found', () => {
-            taskRepository.delete.mockResolvedValue({ affected: 0 });
-            expect(tasksService.deleteVehicle(1, mockUser)).rejects.toThrow(NotFoundException);
+        it('throws as error if vehicle not found', () => {
+            vehicleRepository.delete.mockResolvedValue({ affected: 0 });
+            expect(vehiclesService.deleteVehicle(1, mockUser)).rejects.toThrow(NotFoundException);
         });
     });
 
     describe('updateVehicleStatus', () => {
 
-        it('updates task status', async () => {
+        it('updates vehicle status', async () => {
             const save = jest.fn().mockResolvedValue(true);
 
-            tasksService.getVehicleById = jest.fn().mockResolvedValue({
+            vehiclesService.getVehicleById = jest.fn().mockResolvedValue({
                 status: VehicleStatus.READY,
                 save,
             });
 
-            expect(tasksService.getVehicleById).not.toHaveBeenCalled();
-            const result = await tasksService.updateVehicleStatus(1, VehicleStatus.PARKED);
-            expect(tasksService.getVehicleById).toHaveBeenCalled();
+            expect(vehiclesService.getVehicleById).not.toHaveBeenCalled();
+            const result = await vehiclesService.updateVehicleStatus(1, VehicleStatus.PARKED);
+            expect(vehiclesService.getVehicleById).toHaveBeenCalled();
             expect(save).toHaveBeenCalled();
             expect(result.status).toEqual(VehicleStatus.PARKED);
         });

@@ -1,6 +1,5 @@
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { Task } from '../tasks/task.entity';
 import { Vehicle } from '../vehicles/vehicle.entity';
 
 @Entity()
@@ -17,9 +16,6 @@ export class User extends BaseEntity {
 
   @Column()
   salt: string;
-
-  @OneToMany(type => Task, task => task.user, { eager: true })
-  tasks: Task[];
 
   @OneToMany(type => Vehicle, vehicle => vehicle.user, { eager: true })
   vehicles: Vehicle[];

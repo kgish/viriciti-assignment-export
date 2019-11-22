@@ -76,7 +76,7 @@ export class VehiclesService {
         filterDto: GetVehiclesFilterDto,
         user: User,
     ): Promise<IVehicle[]> {
-        // return this.taskRepository.getTasks(filterDto, user);
+        // return this.taskRepository.getVehicles(filterDto, user);
         return Promise.resolve(this.vehicles);
     }
 

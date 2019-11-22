@@ -106,7 +106,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.form.get('fromDate').setValue(this.minDate);
       this.form.get('toDate').setValue(this.minDate2);
-      this._initCharts();
     }, 200);
   }
 
@@ -151,6 +150,34 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this._resetDataSource();
   }
 
+  selectedIndexChange(event: number) {
+    const charts = [ 'soc', 'speed', 'current', 'odo', 'voltage' ];
+
+    const chart = charts[event];
+
+    const type = 'line';
+    const options: ChartOptions = {
+      responsive: true,
+      legend: {
+        display: false
+      }
+    };
+
+    setTimeout(() => {
+      this.socChart = new Chart(`${ chart }-chart`, {
+        type,
+        data: {
+          labels: [],
+          datasets: [ {
+            data: this.values.map(v => ({ x: v.time, y: v[chart] }))
+          } ]
+        },
+        options
+      });
+    }, 200);
+
+  }
+
   // Private
 
   _resetDataSource(): IValue[] {
@@ -187,7 +214,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return filteredValues;
   }
 
-  _initCharts() {
+  _renderCharts() {
 
     const type = 'line';
     const options: ChartOptions = {
