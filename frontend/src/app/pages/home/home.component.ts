@@ -28,6 +28,7 @@ import {
 } from '../../lib';
 
 import { Unit } from '../../global.types';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-home',
@@ -73,6 +74,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscription: Subscription;
 
   constructor(private vehiclesService: VehicleService,
+              private snackbar: MatSnackBar,
               private fb: FormBuilder) {
   }
 
@@ -109,11 +111,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const toDate: Date = this.form.value.toDate;
     console.log(`onSubmit() value='${JSON.stringify(vehicle)}' fromDate='${fromDate}' toDate='${toDate}'`);
     this.loading = true;
+    const tm = +(new Date());
     setTimeout(() => {
       this.vehiclesService.getVehicleValues(vehicle, fromDate, toDate)
         .subscribe(values => {
             this.values = values;
             this._resetDataSource();
+            this.snackbar.open(`Processed ${values.length} records in ${+(new Date()) - tm} msecs.`, 'X', { duration: 5000 });
           },
           error => console.log(error),
           () => this.loading = false);
