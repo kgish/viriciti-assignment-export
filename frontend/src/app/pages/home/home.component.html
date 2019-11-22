@@ -114,10 +114,42 @@
 
       <mat-tab>
         <ng-template mat-tab-label>
-          <mat-icon class="tab-icon">show_chart</mat-icon>
-          Chart
+          <mat-icon class="tab-icon">pie_chart</mat-icon>
+          Charts
         </ng-template>
-        Chart goes here.
+        <mat-tab-group>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">flag</mat-icon>
+              SOC
+            </ng-template>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">speed</mat-icon>
+              Speed
+            </ng-template>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">show_chart</mat-icon>
+              Current
+            </ng-template>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">dashboard</mat-icon>
+              Odo
+            </ng-template>
+          </mat-tab>
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">battery_std</mat-icon>
+              Voltage
+            </ng-template>
+          </mat-tab>
+
+        </mat-tab-group>
       </mat-tab>
 
     </mat-tab-group>
