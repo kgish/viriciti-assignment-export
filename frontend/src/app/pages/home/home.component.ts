@@ -169,7 +169,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         data: {
           labels: [],
           datasets: [ {
-            data: this.values.map(v => ({ x: v.time, y: v[chart] }))
+            data: this._getDataValues(chart)
           } ]
         },
         options
@@ -179,6 +179,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Private
+
+  _getDataValues(chart: string) {
+    console.log(this.values);
+    const data = this.values.map(v => ({ x: v.time, y: v[chart] }));
+    console.log(data);
+    return data;
+  }
 
   _resetDataSource(): IValue[] {
     let filteredValues = this.values;
