@@ -14,8 +14,7 @@ import { mongoConfig } from '../config/mongodb.config';
 import { redisConfig } from '../config/redis.config';
 import { User } from '../auth/user.entity';
 
-import { unwindStream } from '../lib/unwind.stream';
-import { dateYYYYMMDD } from '../../../frontend/src/app/lib/utils';
+import { dateYYYYMMDD, unwindStream } from '../lib/utils';
 
 export interface IVehicle {
     id: number;
@@ -29,6 +28,11 @@ export interface IValue {
     current: number;
     odo: number;
     voltage: number;
+}
+
+interface IBlock {
+    fromDate: string;
+    toDate: string;
 }
 
 const MSECS_PER_DAY = (1000 * 60 * 60 * 24);
@@ -101,7 +105,7 @@ export class VehiclesService {
         toDate: string,
     ): Promise<any> {
         const vehicle = this.vehicles.find(v => v.id === +id);
-        const prefix = `getVehicleValues() vehicle='${ vehicle.name }'`;
+        const fn = `getVehicleValues() vehicle='${ vehicle.name }'`;
 
         if (!vehicle) {
             throw new NotFoundException(`Vehicle with ID '${ id }' not found`);
@@ -110,10 +114,9 @@ export class VehiclesService {
         const fromMS = +(new Date(fromDate));
         const toMS = +(new Date(toDate));
 
-        let blocks: any[];
-        // let blocks: [ { fromDate: string, toDate: string } ];
+        let blocks: IBlock[];
         const days = (toMS - fromMS) / MSECS_PER_DAY;
-        this.logger.log(`${ prefix } days='${ days }'`);
+        this.logger.log(`${ fn } days='${ days }'`);
 
         if (days === 1) {
             blocks = [ { fromDate, toDate } ];
@@ -127,49 +130,34 @@ export class VehiclesService {
             }
         }
 
-        this.logger.log(`${ prefix } blocks='${ JSON.stringify(blocks) }'`);
+        this.logger.log(`${ fn } n=${ blocks.length } blocks='${ JSON.stringify(blocks) }'`);
 
-        return new Promise((resolve, reject) => {
+        const promises = [];
 
-            const rid = `${ vehicle.name }.${ fromDate.replace('-', '') }.${ toDate.replace('-', '') }`;
-            this.redisClient.get(rid, (err, reply) => {
-                if (err) {
-                    this.logger.log(`${ prefix } rid='${ rid }' error='${ JSON.stringify(err) }'`);
-                } else {
-                    if (reply) {
-                        this.logger.log(`${ prefix } rid='${ rid }' => HIT`);
-                        resolve(JSON.parse(reply));
-                    } else {
-                        this.logger.log(`${ prefix } rid='${ rid }' => MISS`);
-                    }
-                }
-
-                if (err || !reply) {
-
-                    const values = {};
-
-                    parallel([
-                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'soc', fromMS, toMS, values, callback),
-                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'speed', fromMS, toMS, values, callback),
-                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'current', fromMS, toMS, values, callback),
-                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'odo', fromMS, toMS, values, callback),
-                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'voltage', fromMS, toMS, values, callback),
-                        ], error => {
-                            if (error) {
-                                this.logger.error(`${ prefix } => NOK (${ error.message })`);
-                                reject('NOK');
-                            } else {
-                                this.logger.log(`${ prefix } => OK`);
-                                const converted = this._convertValues(values);
-                                this.redisClient.set(rid, JSON.stringify(converted));
-                                resolve(converted);
-                            }
-                        },
-                    );
-                }
-            });
+        blocks.forEach(block => {
+            const from = block.fromDate;
+            const to = block.toDate;
+            promises.push(
+                new Promise((resolve, reject) => resolve(this._getVehicleStatsPerDay(vehicle, from, to)))
+            );
         });
 
+        // return this._getVehicleStatsPerDay(vehicle, fromDate, toDate);
+        return new Promise((resolve, reject) => {
+            Promise.all(promises).then(arrays => {
+                let result = [];
+                if (arrays.length === 1) {
+                    result = arrays[0];
+                } else {
+                    this.logger.log(`${ fn } => OK`);
+                    arrays.forEach(array => array.forEach(item => result.push(item)));
+                }
+                resolve(result);
+            }).catch(error => {
+                this.logger.error(`${ fn } => NOK error='${ error }'`);
+                reject(error);
+            });
+        });
     }
 
     async createVehicle(
@@ -202,6 +190,56 @@ export class VehiclesService {
     // }
 
     // Private
+
+    _getVehicleStatsPerDay(vehicle: IVehicle, fromDate: string, toDate: string) {
+
+        const fn = `_getVehicleStatsPerDay() vehicle='${ vehicle.name }'`;
+
+        const fromMS = +(new Date(fromDate));
+        const toMS = +(new Date(toDate));
+
+        return new Promise((resolve, reject) => {
+
+            const rid = `${ vehicle.name }.${ fromDate.replace('-', '') }.${ toDate.replace('-', '') }`;
+            this.redisClient.get(rid, (err, reply) => {
+                if (err) {
+                    this.logger.log(`${ fn } rid='${ rid }' error='${ JSON.stringify(err) }'`);
+                } else {
+                    if (reply) {
+                        this.logger.log(`${ fn } rid='${ rid }' => HIT`);
+                        resolve(JSON.parse(reply));
+                    } else {
+                        this.logger.log(`${ fn } rid='${ rid }' => MISS`);
+                    }
+                }
+
+                if (err || !reply) {
+
+                    const values = {};
+
+                    parallel([
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'soc', fromMS, toMS, values, callback),
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'speed', fromMS, toMS, values, callback),
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'current', fromMS, toMS, values, callback),
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'odo', fromMS, toMS, values, callback),
+                            callback => this._getVehicleStats(this.mongoClient, vehicle, 'voltage', fromMS, toMS, values, callback),
+                        ], error => {
+                            if (error) {
+                                this.logger.error(`${ fn } => NOK (${ error.message })`);
+                                reject('NOK');
+                            } else {
+                                this.logger.log(`${ fn } => OK`);
+                                const converted = this._convertValues(values);
+                                this.redisClient.set(rid, JSON.stringify(converted));
+                                resolve(converted);
+                            }
+                        },
+                    );
+                }
+            });
+        });
+
+    }
 
     _getVehicleStats(client: MongoClient, vehicle: IVehicle, attribute: string, fromMS: number, toMS: number,
                      results: any, callback: (error: NodeJS.ErrnoException | null) => void) {

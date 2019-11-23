@@ -1,5 +1,5 @@
-import * as _ from "underscore";
-import { Transform, TransformCallback } from "stream";
+import * as _ from 'underscore';
+import { Transform, TransformCallback } from 'stream';
 import { Collection, FilterQuery } from 'mongodb';
 
 interface IDocument {
