@@ -72,7 +72,11 @@ Convert Coffeescript to Typescript
 Where possible replace async with promises.
 Underscore
 
+## Redis
 
+```
+$ redis-commander --redis-port 6379 --redis-host localhost --redis-password viriciti
+```
 
 
 ## References

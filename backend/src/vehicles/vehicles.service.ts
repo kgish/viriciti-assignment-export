@@ -44,36 +44,14 @@ export class VehiclesService {
     private mongoClient: MongoClient;
     private redisClient: RedisClient;
 
-    private vehicles: IVehicle[] = [
-        { id: 1001, name: 'vehicle_001' },
-        { id: 1002, name: 'vehicle_002' },
-        { id: 1003, name: 'vehicle_003' },
-    ];
+    // Filled during call to _connectMongoDB()
+    private vehicles: IVehicle[] = [];
 
     constructor(
         @InjectRepository(VehicleRepository)
         private vehicleRepository: VehicleRepository,
     ) {
-        // Connect to MongoDB
-        this.logger.log(`mongoConfig='${ JSON.stringify(mongoConfig) }'`);
-        const uri = `mongodb://${ mongoConfig.username }:${ mongoConfig.password }@${ mongoConfig.host }:${ mongoConfig.port }`;
-        MongoClient.connect(uri, mongoConfig.settings, (error, client) => {
-            if (error) {
-                this.logger.error(`Cannot connect to mongo, error='${ error.message }'`);
-            } else {
-                this.logger.log(`Connected to mongo database`);
-                this.mongoClient = client;
-            }
-        });
-
-        // Connect to Redis
-        this.logger.log(`redisConfig='${ JSON.stringify(redisConfig) }'`);
-        try {
-            this.redisClient = new RedisClient(redisConfig);
-            this.logger.log(`Connected to redis cache`);
-        } catch (error) {
-            this.logger.error(`Cannot connect to redis, error='${ error.message }'`);
-        }
+        this._init();
     }
 
     getVehicles(
@@ -138,7 +116,7 @@ export class VehiclesService {
             const from = block.fromDate;
             const to = block.toDate;
             promises.push(
-                new Promise((resolve, reject) => resolve(this._getVehicleStatsPerDay(vehicle, from, to)))
+                new Promise((resolve, reject) => resolve(this._getVehicleStatsPerDay(vehicle, from, to))),
             );
         });
 
@@ -190,6 +168,45 @@ export class VehiclesService {
     // }
 
     // Private
+
+    _init() {
+        this._connectMongoDB();
+        this._connectRedis();
+    }
+
+    _connectMongoDB() {
+        this.logger.log(`mongoConfig='${ JSON.stringify(mongoConfig) }'`);
+        const uri = `mongodb://${ mongoConfig.username }:${ mongoConfig.password }@${ mongoConfig.host }:${ mongoConfig.port }`;
+        MongoClient.connect(uri, mongoConfig.settings, (error, client) => {
+            if (error) {
+                this.logger.error(`Cannot connect to mongo, error='${ error.message }'`);
+            } else {
+                this.logger.log(`Connected to mongo database, yay!`);
+                client.db().admin().listDatabases().then(results => {
+                    const ignore = [ 'admin', 'config', 'local' ];
+                    const names = results.databases.map(result => result.name).filter(n => !ignore.includes(n));
+                    let count = 1;
+                    names.forEach(name => {
+                        this.vehicles.push({ id: 1000 + count, name });
+                        count++;
+                    });
+                    this.logger.log(`vehicles='${ JSON.stringify(this.vehicles) }'`);
+                });
+                this.mongoClient = client;
+            }
+        });
+    }
+
+    _connectRedis() {
+        // Connect to Redis
+        this.logger.log(`redisConfig='${ JSON.stringify(redisConfig) }'`);
+        try {
+            this.redisClient = new RedisClient(redisConfig);
+            this.logger.log(`Connected to redis cache, yay!`);
+        } catch (error) {
+            this.logger.error(`Cannot connect to redis, error='${ error.message }'`);
+        }
+    }
 
     _getVehicleStatsPerDay(vehicle: IVehicle, fromDate: string, toDate: string) {
 
