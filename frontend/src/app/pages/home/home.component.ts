@@ -1,19 +1,12 @@
-import {
-  AfterViewInit,
-  Component,
-  OnDestroy,
-  OnInit,
-  ViewChild
-} from '@angular/core';
-
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
-import { MatRadioChange } from '@angular/material/radio';
+import { MatPaginator, MatRadioChange, MatSnackBar, MatSort, MatTableDataSource } from '@angular/material';
 import { Subscription } from 'rxjs';
 
 import { Chart, ChartOptions } from 'chart.js';
 
 import {
+  AuthService,
   IValue,
   IVehicle,
   VehicleService
@@ -30,7 +23,17 @@ import {
 } from '../../lib';
 
 import { Unit } from '../../global.types';
-import { MatSnackBar } from '@angular/material/snack-bar';
+
+interface IPoint {
+  x: number;
+  y: number;
+}
+
+interface IDataValues {
+  miny: number;
+  maxy: number;
+  data: IPoint[];
+}
 
 @Component({
   selector: 'app-home',
@@ -73,6 +76,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     sec: dateYYYYMMDDHHMMSS,
   };
 
+  chartNames = [ 'soc', 'speed', 'current', 'odo', 'voltage' ];
+
   socChart: Chart;
   speedChart: Chart;
   currentChart: Chart;
@@ -83,13 +88,18 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(private vehiclesService: VehicleService,
               private snackbar: MatSnackBar,
+              private auth: AuthService,
               private fb: FormBuilder) {
   }
 
   ngOnInit() {
     this.subscription = this.vehiclesService.getVehicles().subscribe(vehicles => {
       this.vehicles = vehicles;
-      this.form.get('vehicle').setValue(vehicles[0]);
+      if (vehicles.length) {
+        this.form.get('vehicle').setValue(vehicles[0]);
+      } else {
+        this.auth.signout(false);
+      }
     });
 
     this.form = this.fb.group({
@@ -128,7 +138,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             this.snackbar.open(`Fetched ${ values.length } records in ${ +(new Date()) - tm } msecs.`, 'X', { duration: 5000 });
           },
           error => console.log(error),
-          () => this.loading = false);
+          () => this.loading = false
+        );
 
     }, 1000);
   }
@@ -151,26 +162,37 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   selectedIndexChange(event: number) {
-    const charts = [ 'soc', 'speed', 'current', 'odo', 'voltage' ];
 
-    const chart = charts[event];
+    const chart = this.chartNames[event];
 
     const type = 'line';
-    const options: ChartOptions = {
-      responsive: true,
-      legend: {
-        display: false
-      }
-    };
 
     setTimeout(() => {
+      // const { miny, maxy, data } = this._getDataValues(chart);
+      const data = [
+        {x: 10, y: 29 },
+        {x: 11, y: 26 },
+        {x: 12, y: 21 },
+        {x: 15, y: 20 },
+        {x: 19, y: 28 },
+        {x: 20, y: 22 },
+        {x: 25, y: 22 },
+        {x: 27, y: 27 },
+        {x: 28, y: 29 },
+        {x: 33, y: 23 },
+      ];
+
+      // const options = this._setChartOptions(miny, maxy);
+      const options = this._setChartOptions(20, 29);
+
+      // console.log(`miny='${ miny }' maxy='${ maxy }'`);
+      // console.log(data);
+
       this.socChart = new Chart(`${ chart }-chart`, {
         type,
         data: {
           labels: [],
-          datasets: [ {
-            data: this._getDataValues(chart)
-          } ]
+          datasets: [ { fill: false, data } ]
         },
         options
       });
@@ -180,11 +202,45 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Private
 
-  _getDataValues(chart: string) {
-    console.log(this.values);
-    const data = this.values.map(v => ({ x: v.time, y: v[chart] }));
-    console.log(data);
-    return data;
+  _setChartOptions(miny: number, maxy: number): ChartOptions {
+    return {
+      responsive: true,
+      legend: { display: false },
+      scales: {
+        yAxes: [ {
+          ticks: {
+            min: miny,
+            max: maxy
+          }
+        } ]
+      }
+    };
+  }
+
+  // Convert data to an array of (x, y) points, miny and maxy, ignoring undefined (null) values
+  _getDataValues(chart: string): IDataValues {
+    const result: IDataValues = { miny: 0, maxy: 0, data: [] };
+    let first = true;
+    this.values.forEach((v, idx) => {
+      const x = v.time;
+      const y = v[chart];
+      if (y !== null) {
+        if (first) {
+          if (result.miny > y) {
+            result.miny = y;
+          }
+          if (result.maxy < y) {
+            result.maxy = y;
+          }
+          first = false;
+        } else {
+          result.miny = y;
+          result.maxy = y;
+        }
+        result.data.push({ x, y });
+      }
+    });
+    return result;
   }
 
   _resetDataSource(): IValue[] {
@@ -219,49 +275,5 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.dataSource.data = filteredValues;
     return filteredValues;
-  }
-
-  _renderCharts() {
-
-    const type = 'line';
-    const options: ChartOptions = {
-      responsive: true,
-      legend: {
-        position: 'right'
-      }
-    };
-
-    this.socChart = new Chart('soc-chart', {
-      type,
-      data: {
-        labels: [],
-        datasets: [ {
-          data: [ { x: 10, y: 20 }, { x: 20, y: 10 }, { x: 30, y: 50 } ]
-        } ]
-      },
-      options
-    });
-
-    this.speedChart = new Chart('speed-chart', {
-      type,
-      data: {},
-      options
-    });
-
-    this.currentChart = new Chart('current-chart', {
-      type,
-      options
-    });
-
-    this.odoChart = new Chart('odo-chart', {
-      type,
-      options
-    });
-
-    this.voltageChart = new Chart('voltage-chart', {
-      type,
-      data: {},
-      options
-    });
   }
 }
