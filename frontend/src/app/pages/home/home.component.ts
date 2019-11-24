@@ -54,6 +54,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('fromDate', { static: false }) fromDatepicker;
   @ViewChild('toDate', { static: false }) toDatepicker;
 
+  title = 'Start';
+
   form: FormGroup;
   vehicles: IVehicle[];
 
@@ -239,6 +241,79 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Private
 
+  _resetDataSource(): IValue[] {
+    let filteredValues = this.values;
+    if (this.currentUnit !== 'msec') {
+      const filter = this.filters[this.currentUnit];
+      const list = {};
+      filteredValues = [];
+
+      const prev = {
+        time: null,
+        soc: { time: null, value: null },
+        speed: { time: null, value: null },
+        current: { time: null, value: null },
+        odo: { time: null, value: null },
+        voltage: { time: null, value: null },
+      };
+
+      const num = this.values.length;
+      this.values.forEach((v, idx) => {
+        const time = filter(new Date(v.time));
+        if (!list[time]) {
+          list[time] = { soc: null, speed: null, current: null, odo: null, voltage: null };
+        }
+        list[time].time = time;
+        this.attributes.forEach(a => {
+          const name = a.name;
+          if (v[name] !== null) {
+            if (list[time][name] === null) {
+              list[time][name] = 0;
+            }
+            if (prev[name].time === null) {
+              prev[name].time = v.time;
+              prev[name].value = v[name];
+            } else {
+              const diff = v.time - prev[name].time;
+              list[time][name] += diff * v[name];
+            }
+          }
+        });
+
+        if (prev.time !== null && (prev.time !== time || idx === num - 1)) {
+          this.attributes.forEach(a => {
+            const name = a.name;
+            list[time][name] /= 1;
+          });
+        }
+        prev.time = time;
+      });
+
+      Object.keys(list).sort().forEach(time => {
+        const v = list[time];
+        filteredValues.push({
+          time: v.time,
+          soc: v.soc,
+          speed: v.speed,
+          current: v.current,
+          odo: v.odo,
+          voltage: v.voltage,
+        });
+      });
+    }
+
+    const checked = this.attributes.filter(a => a.checked).map(v => v.name);
+    if (checked.length) {
+      filteredValues = filteredValues.filter(v => checked.every(a => v[a] !== null));
+    }
+
+    this.dataSource.data = filteredValues;
+
+    return filteredValues;
+  }
+
+  // --- CHART --- //
+
   _setChartOptions(miny: number, maxy: number): ChartOptions {
     return {
       responsive: true,
@@ -278,48 +353,5 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     return result;
-  }
-
-  _resetDataSource(): IValue[] {
-    let filteredValues = this.values;
-    if (this.currentUnit !== 'msec') {
-      const filter = this.filters[this.currentUnit];
-      const list = {};
-      filteredValues = [];
-
-      this.values.forEach(v => {
-        const time = filter(new Date(v.time));
-        if (!list[time]) {
-          list[time] = { soc: 0, speed: 0, current: 0, odo: 0, voltage: 0 };
-        }
-        list[time].time = time;
-        list[time].soc += v.soc;
-        list[time].speed += v.speed;
-        list[time].current += v.current;
-        list[time].odo += v.odo;
-        list[time].voltage += v.voltage;
-      });
-
-      Object.keys(list).sort().forEach(time => {
-        const v = list[time];
-        filteredValues.push({
-          time: v.time,
-          soc: v.soc,
-          speed: v.speed,
-          current: v.current,
-          odo: v.odo,
-          voltage: v.voltage,
-        });
-      });
-    }
-
-    const checked = this.attributes.filter(a => a.checked).map(v => v.name);
-    if (checked.length) {
-      filteredValues = filteredValues.filter(v => checked.every(a => v[a] !== null));
-    }
-
-    this.dataSource.data = filteredValues;
-
-    return filteredValues;
   }
 }

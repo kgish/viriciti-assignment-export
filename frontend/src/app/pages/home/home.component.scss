@@ -1,5 +1,14 @@
-h2 {
+.page-header {
+  padding-top: 1rem;
   color: #7CA363;
+
+  .title {
+    font-size: 1.8rem;
+  }
+}
+
+.description {
+  margin-top: 0.5rem;
 }
 
 form {
@@ -23,7 +32,7 @@ table {
 
 .attribute,
 .unit {
-  margin-right: 1rem;
+  margin-right: 0.7rem;
 }
 
 .tab-icon {
