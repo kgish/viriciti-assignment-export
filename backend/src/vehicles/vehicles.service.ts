@@ -1,7 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MongoClient } from 'mongodb';
-import { RedisClient } from 'redis';
 import { pipeline, Writable } from 'stream';
 import { parallel } from 'async';
 
@@ -10,11 +8,13 @@ import { GetVehiclesFilterDto } from './dto/get-vehicles-filter.dto';
 import { VehicleRepository } from './vehicle.repository';
 // import { VehicleStatus } from './vehicle-status.enum';
 import { Vehicle } from './vehicle.entity';
-import { mongoConfig } from '../config/mongodb.config';
-import { redisConfig } from '../config/redis.config';
 import { User } from '../auth/user.entity';
 
 import { dateYYYYMMDD, unwindStream } from '../lib/utils';
+
+import { MongodbService, RedisService } from '../microservices';
+import { RedisClient } from 'redis';
+import { MongoClient } from 'mongodb';
 
 export interface IVehicle {
     id: number;
@@ -44,14 +44,17 @@ export class VehiclesService {
     private mongoClient: MongoClient;
     private redisClient: RedisClient;
 
-    // Filled during call to _connectMongoDB()
-    private vehicles: IVehicle[] = [];
+    private vehicles: IVehicle[];
 
     constructor(
         @InjectRepository(VehicleRepository)
         private vehicleRepository: VehicleRepository,
+        private mongodb: MongodbService,
+        private redis: RedisService,
     ) {
-        this._init();
+        this.redisClient = redis.client;
+        this.mongoClient = mongodb.client;
+        this.vehicles = mongodb.getVehicles();
     }
 
     getVehicles(
@@ -168,45 +171,6 @@ export class VehiclesService {
     // }
 
     // Private
-
-    _init() {
-        this._connectMongoDB();
-        this._connectRedis();
-    }
-
-    _connectMongoDB() {
-        this.logger.log(`mongoConfig='${ JSON.stringify(mongoConfig) }'`);
-        const uri = `mongodb://${ mongoConfig.username }:${ mongoConfig.password }@${ mongoConfig.host }:${ mongoConfig.port }`;
-        MongoClient.connect(uri, mongoConfig.settings, (error, client) => {
-            if (error) {
-                this.logger.error(`Cannot connect to mongo, error='${ error.message }'`);
-            } else {
-                this.logger.log(`Connected to mongo database, yay!`);
-                client.db().admin().listDatabases().then(results => {
-                    const ignore = [ 'admin', 'config', 'local' ];
-                    const names = results.databases.map(result => result.name).filter(n => !ignore.includes(n));
-                    let count = 1;
-                    names.forEach(name => {
-                        this.vehicles.push({ id: 1000 + count, name });
-                        count++;
-                    });
-                    this.logger.log(`vehicles='${ JSON.stringify(this.vehicles) }'`);
-                });
-                this.mongoClient = client;
-            }
-        });
-    }
-
-    _connectRedis() {
-        // Connect to Redis
-        this.logger.log(`redisConfig='${ JSON.stringify(redisConfig) }'`);
-        try {
-            this.redisClient = new RedisClient(redisConfig);
-            this.logger.log(`Connected to redis cache, yay!`);
-        } catch (error) {
-            this.logger.error(`Cannot connect to redis, error='${ error.message }'`);
-        }
-    }
 
     _getVehicleStatsPerDay(vehicle: IVehicle, fromDate: string, toDate: string) {
 

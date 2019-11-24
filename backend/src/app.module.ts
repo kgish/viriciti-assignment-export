@@ -8,6 +8,8 @@ import { HealthCheckModule } from './health-check/health-check.module';
 import { VehiclesModule } from './vehicles/vehicles.module';
 import { VerifyTokenModule } from './verify-token/verify-token.module';
 
+import { MongodbModule, RedisModule } from './microservices';
+
 import { typeOrmConfig } from './config/typeorm.config';
 import { rateLimiterConfig } from './config/rate-limiter.config';
 
@@ -15,7 +17,9 @@ import { rateLimiterConfig } from './config/rate-limiter.config';
     imports: [
         AuthModule,
         HealthCheckModule,
+        MongodbModule,
         RateLimiterModule.register(rateLimiterConfig),
+        RedisModule,
         TypeOrmModule.forRoot(typeOrmConfig),
         VehiclesModule,
         VerifyTokenModule,

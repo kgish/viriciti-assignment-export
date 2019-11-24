@@ -33,6 +33,10 @@
         <mat-datepicker #toDate [startAt]="minDate"></mat-datepicker>
       </mat-form-field>
 
+      <div class="attributes">
+        <mat-checkbox *ngFor="let attribute of attributes" [name]="attribute.name" (change)="changeAttribute($event)" class="attribute">{{attribute.name}}</mat-checkbox>
+      </div>
+
       <mat-radio-group>
         <div class="units">
           <mat-radio-button class="unit" *ngFor="let unit of units; let idx = index" [value]="unit"

@@ -23,6 +23,7 @@ import {
 } from '../../lib';
 
 import { Unit } from '../../global.types';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 interface IPoint {
   x: number;
@@ -33,6 +34,11 @@ interface IDataValues {
   miny: number;
   maxy: number;
   data: IPoint[];
+}
+
+interface ICheckbox {
+  name: string;
+  checked: boolean;
 }
 
 @Component({
@@ -64,8 +70,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   values: IValue[] = [];
 
   units: Unit[] = [ 'msec', 'sec', 'min', 'hour', 'day' ];
-
   currentUnit: Unit = 'msec';
+
+  attributes: ICheckbox[] = [
+    { name: 'soc', checked: false },
+    { name: 'speed', checked: false },
+    { name: 'current', checked: false },
+    { name: 'odo', checked: false },
+    { name: 'voltage', checked: false },
+  ];
 
   filters = {
     year: dateYYYY,
@@ -156,6 +169,21 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     document.body.removeChild(textarea);
   }
 
+  changeAttribute(event: MatCheckboxChange) {
+    const checked = event.checked;
+    const source = event.source;
+    const name = source.name;
+    console.log(`changeAttribute() name='${ name }' checked='${ checked }'`);
+    const found = this.attributes.find(a => a.name === name);
+    if (found) {
+      found.checked = checked;
+    } else {
+      console.error(`changeAttribute() invalid name='${ name }'`);
+    }
+    console.log(`changeAttribute() attributes='${ JSON.stringify(this.attributes) }'`);
+    this._resetDataSource();
+  }
+
   unitChanged(event: MatRadioChange) {
     this.currentUnit = event.value;
     this._resetDataSource();
@@ -170,16 +198,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       // const { miny, maxy, data } = this._getDataValues(chart);
       const data = [
-        {x: 10, y: 29 },
-        {x: 11, y: 26 },
-        {x: 12, y: 21 },
-        {x: 15, y: 20 },
-        {x: 19, y: 28 },
-        {x: 20, y: 22 },
-        {x: 25, y: 22 },
-        {x: 27, y: 27 },
-        {x: 28, y: 29 },
-        {x: 33, y: 23 },
+        { x: 10, y: 29 },
+        { x: 11, y: 26 },
+        { x: 12, y: 21 },
+        { x: 15, y: 20 },
+        { x: 19, y: 28 },
+        { x: 20, y: 22 },
+        { x: 25, y: 22 },
+        { x: 27, y: 27 },
+        { x: 28, y: 29 },
+        { x: 33, y: 23 },
       ];
 
       // const options = this._setChartOptions(miny, maxy);
@@ -221,7 +249,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   _getDataValues(chart: string): IDataValues {
     const result: IDataValues = { miny: 0, maxy: 0, data: [] };
     let first = true;
-    this.values.forEach((v, idx) => {
+    this.values.forEach(v => {
       const x = v.time;
       const y = v[chart];
       if (y !== null) {
@@ -249,6 +277,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       const filter = this.filters[this.currentUnit];
       const list = {};
       filteredValues = [];
+
       this.values.forEach(v => {
         const time = filter(new Date(v.time));
         if (!list[time]) {
@@ -261,6 +290,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         list[time].odo += v.odo;
         list[time].voltage += v.voltage;
       });
+
       Object.keys(list).sort().forEach(time => {
         const v = list[time];
         filteredValues.push({
@@ -273,7 +303,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       });
     }
+
+    const checked = this.attributes.filter(a => a.checked).map(v => v.name);
+    if (checked.length) {
+      filteredValues = filteredValues.filter(v => checked.every(a => v[a] !== null));
+    }
+
     this.dataSource.data = filteredValues;
+
     return filteredValues;
   }
 }
