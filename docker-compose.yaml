@@ -40,24 +40,24 @@ services:
     networks:
       - viriciti-network
 
-  mongo-test:
-    image: mongo:latest
-    container_name: 'mongo_test_db'
-    environment:
-      MONGO_INITDB_DATABASE: viriciti-test
-      MONGO_INITDB_ROOT_USERNAME: viriciti-test
-      MONGO_INITDB_ROOT_PASSWORD: viriciti-test
-    healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    volumes:
-      - ./data/db/mongo-test:/data/db
-    ports:
-      - "27018:27017"
-    networks:
-      - viriciti-network
+#  mongo-test:
+#    image: mongo:latest
+#    container_name: 'mongo_test_db'
+#    environment:
+#      MONGO_INITDB_DATABASE: viriciti-test
+#      MONGO_INITDB_ROOT_USERNAME: viriciti-test
+#      MONGO_INITDB_ROOT_PASSWORD: viriciti-test
+#    healthcheck:
+#      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 3
+#    volumes:
+#      - ./data/db/mongo-test:/data/db
+#    ports:
+#      - "27018:27017"
+#    networks:
+#      - viriciti-network
 
   redis:
     image: bitnami/redis:latest
@@ -65,10 +65,10 @@ services:
     environment:
       REDIS_PASSWORD: 'viriciti'
     healthcheck:
-        test: ["CMD", "redis-cli","ping"]
-        interval: 10s
-        timeout: 5s
-        retries: 3
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     volumes:
       - /data/db/redis
     ports:
@@ -78,13 +78,15 @@ services:
       - viriciti-network
 
 #  backend:
-#    image: redis:latest
-#    container_name: 'redis_cache'
-#    healthcheck:
-#      test: ["CMD", "redis-cli","ping"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 3
+#    build:
+#      context: backend
+#      dockerfile: backend/Dockerfile
+#    container_name: 'backend_nestjs'
+#    #    healthcheck:
+#    #      test: ["CMD", "wget", "http://localhost:3000"]
+#    #      interval: 10s
+#    #      timeout: 5s
+#    #      retries: 3
 #    depends_on:
 #      postgres:
 #        condition: service_healthy
