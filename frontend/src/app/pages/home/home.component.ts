@@ -163,7 +163,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const toDate: Date = this.form.value.toDate;
     const textarea = document.createElement('textarea');
     document.body.appendChild(textarea);
-    textarea.value = exportToCsv(this._resetDataSource(), vehicle.name, fromDate, toDate);
+    // remove null values
+    const data = this._resetDataSource().map(v => ({
+      time: v.time,
+      soc: v.soc === null ? '' : v.soc,
+      speed: v.speed === null ? '' : v.speed,
+      current: v.current === null ? '' : v.current,
+      odo: v.odo === null ? '' : v.odo,
+      voltage: v.voltage === null ? '' : v.voltage,
+    }));
+    textarea.value = exportToCsv(data, vehicle.name, fromDate, toDate);
     textarea.select();
     document.execCommand('copy');
     document.body.removeChild(textarea);
@@ -295,11 +304,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         const v = list[time];
         filteredValues.push({
           time: v.time,
-          soc: v.soc || '',
-          speed: v.speed || '',
-          current: v.current || '',
-          odo: v.odo || '',
-          voltage: v.voltage || '',
+          soc: v.soc,
+          speed: v.speed,
+          current: v.current,
+          odo: v.odo,
+          voltage: v.voltage,
         });
       });
     }
