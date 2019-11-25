@@ -1,11 +1,23 @@
-FROM node:10-alpine
-WORKDIR /usr/src/app
+FROM node:12-alpine as builder
 
-COPY . .
-RUN npm install
+ENV NODE_ENV build
 
-EXPOSE 3000
-CMD ["npm", "run", "start:prod"]
+USER node
+WORKDIR /home/node
 
+COPY . /home/node
 
+RUN npm ci \
+    && npm run build
 
+FROM node:12-alpine
+
+USER node
+WORKDIR /home/node
+
+COPY --from=builder /home/node/package*.json /home/node/
+COPY --from=builder /home/node/dist/ /home/node/dist/
+
+RUN npm ci
+
+CMD ["node", "dist/main.js"]

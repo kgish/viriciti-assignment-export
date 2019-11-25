@@ -26,6 +26,14 @@ db:
       connectTimeoutMS: 5000
       socketTimeoutMS: 5000
 
+redis:
+  type: 'redis'
+  host: 'localhost'
+  port: 6379
+  db: 1
+  password: 'viriciti'
+  prefix: ''
+
 rate-limiter:
   points: 100
   duration: 60
@@ -37,7 +45,8 @@ jwt:
 
 ## ENV
 
-The following environment variables can be used to override the configuration values.
+The following environment variables can be used to override the configuration values, for example when starting it as
+a docker container using `docker-compose`.
 
 ```
 # Postgres

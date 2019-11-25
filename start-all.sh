@@ -4,20 +4,17 @@
 #
 # Syntax:
 #
-#     ./init-all.sh
+#     ./start-all.sh
 #
 # Description:
 #
-#    Initialize setups for all components.
+#    Fire up docker-compose, backend and frontend.
 #
 # ----------------------------------------------------------------------------
 
-chmod +x ./mongo-restore.sh
-chmod +x ./start-all.sh
-cd tooling
-npm install
-cd ../backend
-npm install
+docker-compose down -v
+docker-compose down -v
+docker-compose up -d
+
 cd ../frontend
-npm install
-cd ..
+npm run start:hmr

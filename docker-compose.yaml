@@ -40,24 +40,25 @@ services:
     networks:
       - viriciti-network
 
-#  mongo-test:
-#    image: mongo:latest
-#    container_name: 'mongo_test_db'
-#    environment:
-#      MONGO_INITDB_DATABASE: viriciti-test
-#      MONGO_INITDB_ROOT_USERNAME: viriciti-test
-#      MONGO_INITDB_ROOT_PASSWORD: viriciti-test
-#    healthcheck:
-#      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 3
-#    volumes:
-#      - ./data/db/mongo-test:/data/db
-#    ports:
-#      - "27018:27017"
-#    networks:
-#      - viriciti-network
+  mongo-test:
+    image: mongo:latest
+    container_name: 'mongo_test_db'
+    environment:
+      NODE_ENV: development
+      MONGO_INITDB_DATABASE: viriciti-test
+      MONGO_INITDB_ROOT_USERNAME: viriciti-test
+      MONGO_INITDB_ROOT_PASSWORD: viriciti-test
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - ./data/db/mongo-test:/data/db
+    ports:
+      - "27018:27017"
+    networks:
+      - viriciti-network
 
   redis:
     image: bitnami/redis:latest
@@ -80,13 +81,13 @@ services:
   backend:
     build:
       context: backend
-      dockerfile: backend/Dockerfile
+      dockerfile: Dockerfile
     container_name: 'backend_nestjs'
-    #    healthcheck:
-    #      test: ["CMD", "wget", "http://localhost:3000"]
-    #      interval: 10s
-    #      timeout: 5s
-    #      retries: 3
+    healthcheck:
+      test: ["CMD", "wget", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     depends_on:
       postgres:
         condition: service_healthy
