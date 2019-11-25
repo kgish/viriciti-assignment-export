@@ -22,7 +22,7 @@ import {
   exportToCsv
 } from '../../lib';
 
-import { Unit } from '../../global.types';
+import { Unit, unitIntervals } from '../../global.types';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
 interface IPoint {
@@ -200,6 +200,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this._resetDataSource();
   }
 
+  applyFilter(filterValue: string) {
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
   selectedIndexChange(event: number) {
 
     const chart = this.chartNames[event];
@@ -242,51 +246,96 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   // Private
 
   _resetDataSource(): IValue[] {
+
+    const resetList = (bookmark, t) => {
+      console.log(`resetList() bookmark='${ JSON.stringify(bookmark) }' t='${t}'`);
+      const result = {
+        time: t,
+        soc: bookmark.soc.value,
+        speed: bookmark.speed.value,
+        current: bookmark.current.value,
+        odo: bookmark.speed.value,
+        voltage: bookmark.speed.value
+      };
+      console.log(`resetList() result='${ JSON.stringify(result) }'`);
+      return result;
+    };
+
+    const updateList = (list, t) => {
+      console.log(`updateList() list='${ JSON.stringify(list) }' t='${t}'`);
+      const result = list[t];
+      console.log(JSON.stringify(result));
+      this.attributes.forEach(a => {
+        const name = a.name;
+        console.log(`name='${ name }' list='${ result[name] }'`);
+        console.log(`before: list='${ result[name] }'`);
+        if (result[name]) {
+          result[name] /= unitIntervals[this.currentUnit];
+        }
+        console.log(`after:  list='${ result[name] }'`);
+      });
+      console.log(`updateList() result='${ JSON.stringify(result) }'`);
+      return result;
+    };
+
+    if (!this.values || !this.values.length) {
+      return [];
+    }
+
     let filteredValues = this.values;
+
     if (this.currentUnit !== 'msec') {
       const filter = this.filters[this.currentUnit];
       const list = {};
       filteredValues = [];
 
-      const prev = {
-        time: null,
-        soc: { time: null, value: null },
-        speed: { time: null, value: null },
-        current: { time: null, value: null },
-        odo: { time: null, value: null },
-        voltage: { time: null, value: null },
+      // Setup all the initial values
+      const v0 = this.values[0];
+      const t0 = v0.time;
+      const bookmark = {
+        time: t0,
+        soc: { time: v0.soc === null ? null : t0, value: v0.soc },
+        speed: { time: v0.speed === null ? null : t0, value: v0.speed },
+        current: { time: v0.current === null ? null : t0, value: v0.current },
+        odo: { time: v0.odo === null ? null : t0, value: v0.odo },
+        voltage: { time: v0.voltage === null ? null : t0, value: v0.voltage },
       };
 
+      list[filter(new Date(t0))] = { time: t0, soc: null, speed: null, current: null, odo: null, voltage: null };
+
       const num = this.values.length;
-      this.values.forEach((v, idx) => {
-        const time = filter(new Date(v.time));
-        if (!list[time]) {
-          list[time] = { soc: null, speed: null, current: null, odo: null, voltage: null };
+      this.values.slice(1).forEach((v, idx) => {
+        const vtime: number = v.time;
+        const t = filter(new Date(vtime));
+        if (!list[t]) {
+          // Finished previous time interval
+          list[t] = resetList(bookmark, vtime);
+          const tprev = filter(new Date(bookmark.time));
+          list[tprev] = updateList(list, tprev);
         }
-        list[time].time = time;
         this.attributes.forEach(a => {
-          const name = a.name;
-          if (v[name] !== null) {
-            if (list[time][name] === null) {
-              list[time][name] = 0;
+          const name: string = a.name;
+          const vvalue: number = v[name];
+          if (vvalue !== null) {
+            if (bookmark[name].time !== null) {
+              const diff = vtime - bookmark[name].time;
+              // console.log(`name='${ name }' value='${ vvalue }' time='${ vtime }' bookmark='${ bookmark[name].time }' diff='${ diff }'`);
+              // console.log(`before list='${ list[t][name] }'`);
+              list[t][name] += diff * vvalue;
+              // console.log(`after list='${ list[t][name] }'`);
             }
-            if (prev[name].time === null) {
-              prev[name].time = v.time;
-              prev[name].value = v[name];
-            } else {
-              const diff = v.time - prev[name].time;
-              list[time][name] += diff * v[name];
-            }
+            bookmark[name].time = vtime;
+            bookmark[name].value = vvalue;
           }
         });
 
-        if (prev.time !== null && (prev.time !== time || idx === num - 1)) {
-          this.attributes.forEach(a => {
-            const name = a.name;
-            list[time][name] /= 1;
-          });
+        if (idx === num - 1) {
+          // We've reached the end of the data.
+          list[t] = updateList(list, t);
+        } else {
+          // Still going strong.
+          bookmark.time = vtime;
         }
-        prev.time = time;
       });
 
       Object.keys(list).sort().forEach(time => {
@@ -302,6 +351,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
 
+    // If one or more of the attribute checkboxes are checked, then filter out those
+    // records which contain null values for those checked attributes.
     const checked = this.attributes.filter(a => a.checked).map(v => v.name);
     if (checked.length) {
       filteredValues = filteredValues.filter(v => checked.every(a => v[a] !== null));

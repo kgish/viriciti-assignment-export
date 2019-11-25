@@ -35,15 +35,19 @@
       </mat-form-field>
 
       <div class="attributes">
-        <mat-checkbox *ngFor="let attribute of attributes" [name]="attribute.name" (change)="changeAttribute($event)" class="attribute">{{attribute.name}}</mat-checkbox>
+        <mat-checkbox [disabled]="!values || !values.length" *ngFor="let attribute of attributes" [name]="attribute.name" (change)="changeAttribute($event)" class="attribute">{{attribute.name}}</mat-checkbox>
       </div>
 
       <mat-radio-group>
         <div class="units">
-          <mat-radio-button class="unit" *ngFor="let unit of units; let idx = index" [value]="unit"
+          <mat-radio-button [disabled]="!values || !values.length" class="unit" *ngFor="let unit of units; let idx = index" [value]="unit"
                             [checked]="idx === 0" (change)="unitChanged($event)">{{unit}}</mat-radio-button>
         </div>
       </mat-radio-group>
+
+      <mat-form-field>
+        <input [disabled]="!values || !values.length" matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+      </mat-form-field>
 
       <div fxLayout fxLayoutGap="10px">
         <button mat-raised-button type="submit" [disabled]="form.invalid">Submit</button>
