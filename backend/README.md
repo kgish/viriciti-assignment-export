@@ -129,7 +129,7 @@ GET /health-check
 
 ## Verify token
 ```
-GET /health-check
+GET /verify-token
 ```
 
 ## Sign up new user
