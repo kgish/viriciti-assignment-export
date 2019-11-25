@@ -82,6 +82,8 @@ The strategy consists of the following:
 
 Here is a diagram illustrating these prinicples:
 
+![Architecture Diagram](images/architecture.png)
+
 
 ### MongoDB
 
