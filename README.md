@@ -6,6 +6,10 @@ In order to be able to better assess my technical expertise, the kind folks at V
 
 Hopefully the results will demonstrate that I am a qualified candidate and keep me in the loop of things.
 
+For the latest version of this assignment you can access my private [viriciti-assignment-export](https://github.com/kgish/viriciti-assignment-export)
+repository assuming I have designated you a collaborator.
+
+See my contact information below.
 
 ## Problem
 
@@ -370,3 +374,17 @@ Here are some references you might be interested in listed by alphabetical order
 * [TypeScript](https://www.typescriptlang.org)
 * [UnderscoreJS](https://underscorejs.org)
 
+## Contact
+
+Here is my contact information.
+
+```
+Kiffin Gish
+Gouda, The Netherlands
+Email: kiffin.gish@planet.nl
+Tel: +31 657.552.871
+---
+Github: https://github.com/kgish
+Twitter: http://twitter.com/kiffin
+LinkedIn: http://www.linkedin.com/in/kiffin
+```
