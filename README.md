@@ -55,18 +55,19 @@ These are the steps that I took in order to tackle this challenging assignment:
 
 You should have some knowledge of the following and have the relevant items installed.
 
-* Git
-* Docker
 * Angular
-* Node
-* NestJS
-* Postgres
-* MongoDB
-* Redis
-* Chartjs
-* Jasmine
 * Chai
+* Chartjs
+* Docker
+* Git
+* Jasmine
 * Jest
+* MongoDB
+* NestJS
+* Node
+* Coca-cola
+* Postgres
+* Redis
 
 
 ## Architecture
@@ -89,56 +90,94 @@ Here is a diagram illustrating these prinicples:
 
 ![Architecture Diagram](images/architecture.png)
 
+For the sake of simplicity, I have left out scalability, clustering etc. and focussed on this core building block.
+
+More discussion is possible about imporvements like placing load-balancer(s) in front of the API server, using multiple
+ instances of the API server, clustering MongoDB and/or Redis, using Balena for managing fleets of linux devices, 
+ ad infinitum.
+ 
+Please note that when it comes to cloud computing and modern technologies, the sky is the limit (as long as you have a
+big enough budget).
 
 ### MongoDB
+
+For querying vehicle datasets for given time intervals.
 
 For exploring the data, the [MongoDB Compass](https://www.mongodb.com/products/compass) GUI is used.
 
 In the `docker-compose.yaml` file:
 ```
-  mongo:
-    image: mongo:latest
-    container_name: 'mongo_db'
-    environment:
-      MONGO_INITDB_DATABASE: viriciti
-      MONGO_INITDB_ROOT_USERNAME: viriciti
-      MONGO_INITDB_ROOT_PASSWORD: viriciti
-    healthcheck:
-      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    volumes:
-      - ./data/db/mongo:/data/db
-    ports:
-      - "27017:27017"
-    networks:
-      - viriciti-network
+mongo:
+  image: mongo:latest
+  container_name: 'mongo_db'
+  environment:
+    MONGO_INITDB_DATABASE: viriciti
+    MONGO_INITDB_ROOT_USERNAME: viriciti
+    MONGO_INITDB_ROOT_PASSWORD: viriciti
+  healthcheck:
+    test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+    interval: 10s
+    timeout: 5s
+    retries: 3
+  volumes:
+    - ./data/db/mongo:/data/db
+ ports:
+    - "27017:27017"
+  networks:
+    - viriciti-network
 ```
 
 ### Redis
+
+For caching the MongoDB results in order to increase performance.
 
 For exploring the data, the [Redis Desktop](https://redisdesktop.com) GUI is used.
 
 In the `docker-compose.yaml` file:
 ```
-  redis:
-    image: bitnami/redis:latest
-    container_name: 'redis_cache'
-    environment:
-      REDIS_PASSWORD: 'viriciti'
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-    volumes:
-      - /data/db/redis
-    ports:
-      - "6379:6379"
-    restart: always
-    networks:
-      - viriciti-network
+redis:
+  image: bitnami/redis:latest
+  container_name: 'redis_cache'
+  environment:
+    REDIS_PASSWORD: 'viriciti'
+  healthcheck:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: 10s
+    timeout: 5s
+    retries: 3
+  volumes:
+    - /data/db/redis
+  ports:
+    - "6379:6379"
+  restart: always
+  networks:
+    - viriciti-network
+```
+## Postgres
+
+For storing the user data for authorization.
+
+For exploring the data, the [pgAdmin](https://www.pgadmin.org/) GUI is used.
+
+```
+postgres:
+  image: postgres:9.6.2-alpine
+  container_name: 'postgres_db'
+  environment:
+    POSTGRES_USER: viriciti
+    POSTGRES_PASSWORD: viriciti
+    POSTGRES_DB: viriciti
+  healthcheck:
+    test: ["CMD", "pg_isready", "-U", "viriciti"]
+    interval: 10s
+    timeout: 5s
+    retries: 3
+  volumes:
+    - ./data/db/postgres:/var/lib/postgresql/data
+  ports:
+    - "5432:5432"
+  networks:
+    - viriciti-network
 ```
 
 ## Installation

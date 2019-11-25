@@ -94,6 +94,30 @@ $ npm run start
 $ npm run start:dev
 ```
 
+## Authentication
+
+NestJS provides JWT support out of the box by using `passport` with the `passport-local` strategy.
+
+This is accomplished by creating an `AuthService` which implements a `validateUser` in order to validate
+the user name and password used.
+
+auth/auth.service.ts
+```
+@Injectable()
+export class AuthService {
+  constructor(private readonly usersService: UsersService) {}
+      
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findOne(username);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+}
+```
+
 ## API
 
 The API is relatively simple and consists of the following calls:
@@ -225,4 +249,4 @@ $ npm run test:e2e
 * [Node Rate Limiter](https://github.com/animir/node-rate-limiter-flexible)
 * [Redis for NestJS](https://docs.nestjs.com/microservices/redis)
 * [Caching a MongoDB Database with Redis](https://codeforgeek.com/caching-a-mongodb-database-with-redis)
-
+* [NestJS Authentication](https://docs.nestjs.com/techniques/authentication)
