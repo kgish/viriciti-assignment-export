@@ -101,6 +101,12 @@ proxy.conf.json
 }
 ```
 
+## Theming
+
+I did my best to implement a pseudo Viriciti (green) house style but admit that it is not perfect. Fortunately, once you know the defined color palettes,
+Material Design makes it very easy to implement.
+
+
 ## Export
 
 The user can download a csv document by clicking on the download button.
