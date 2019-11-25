@@ -115,11 +115,33 @@ The file name is formatted as `${vehicle_name}-from_date-to_date.csv`
 
 Uses the [export-to-csv](https://www.npmjs.com/package/export-to-csv) library.
 
+```
+onDownload() {
+  ...
+  document.body.appendChild(textarea);
+  ...
+  textarea.value = exportToCsv(data, vehicle.name, fromDate, toDate);
+  textarea.select();
+  document.execCommand('copy');
+  document.body.removeChild(textarea);
+}
+```
+
+For more details, see [lib/utils/export-to-csv.ts](./src/lib/utils/export-to-csv.ts).
 
 ## Testing
 
-TODO
+Run the unit tests.
 
+```
+$ npm run test
+```
+
+Run the end-to-end tests.
+
+```
+$ npm run e2e
+```
 
 ## References
 

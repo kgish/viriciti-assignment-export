@@ -200,12 +200,22 @@ In order to enable it for a given controller or globally, use the following deco
 
 ```
 @UseInterceptors(RateLimiterInterceptor)
-
 ```
 
 ## Testing
 
-TODO
+Run the unit tests.
+
+```
+$ npm run test
+```
+
+Run the end-to-end tests.
+
+```
+$ npm run test:e2e
+
+```
   
 ## References
 
