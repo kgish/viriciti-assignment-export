@@ -25,7 +25,7 @@ over the given time interval. The default view is msec.
 There are two tabs displayed: table and chart. The default is table. By selected the chart tab you can view charts of the different attributes based
 on the displayed dataset.
 
-Uses the [chartjs](https://www.chartjs.org)
+Uses the [chartjs](https://www.chartjs.org) library.
 
 
 ## Authorization
@@ -107,7 +107,7 @@ The user can download a csv document by clicking on the download button.
 
 The file name is formatted as `${vehicle_name}-from_date-to_date.csv`
 
-Uses the [export-to-csv](https://www.npmjs.com/package/export-to-csv) library
+Uses the [export-to-csv](https://www.npmjs.com/package/export-to-csv) library.
 
 
 ## References
