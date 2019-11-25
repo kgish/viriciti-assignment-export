@@ -129,7 +129,18 @@ onDownload() {
 
 For more details, see [lib/utils/export-to-csv.ts](./src/lib/utils/export-to-csv.ts).
 
-## Testing
+
+## Quality Assurance
+
+### Linting
+
+Validate correctness of source code.
+
+```
+$ npm run lint
+```
+
+### Testing
 
 Run the unit tests.
 
