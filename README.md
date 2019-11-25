@@ -78,7 +78,7 @@ trying to export the data.
 
 The strategy consists of the following:
 
-* Restrict access to authorized users [JSON Web Tokens](https://jwt.io).
+* Restrict access to authorized users by using [JSON Web Tokens](https://jwt.io).
 * Use a [Rate Limiter](https://github.com/animir/node-rate-limiter-flexible) to limit too many API calls.
 * Cache dataset results for recurring calls.
 * Split date ranges into common interval blocks (days).
@@ -91,7 +91,7 @@ Here is a diagram illustrating these prinicples:
 
 ### MongoDB
 
-For exploring the data the [MongoDB Compass](https://www.mongodb.com/products/compass) GUI is used.
+For exploring the data, the [MongoDB Compass](https://www.mongodb.com/products/compass) GUI is used.
 
 In the `docker-compose.yaml` file:
 ```
@@ -117,7 +117,7 @@ In the `docker-compose.yaml` file:
 
 ### Redis
 
-For exploring the data the [Redis Desktop](https://redisdesktop.com) GUI is used.
+For exploring the data, the [Redis Desktop](https://redisdesktop.com) GUI is used.
 
 In the `docker-compose.yaml` file:
 ```
@@ -162,7 +162,8 @@ $ mongdb-compass # verify vehicle databases were created
 $ docker-compose down -v
 ```
 
-Note: You will need to run the `mongo-restore.sh` script preceded with `FORCE=true` in order actually to do the import.
+Note: As an extrra safety precaution, you will need to run the `mongo-restore.sh` script preceded with `FORCE=true` 
+in order actually to do the import.
 
 ### Verify
 
@@ -191,11 +192,11 @@ There are five sub-directories:
 └── tooling
 ```
 
-### assignment
+### /assignment
 
 This is where the original assignment is located without any changes made to it.
 
-### frontend
+### /frontend
 
 ```
 .
@@ -222,7 +223,7 @@ This is where the original assignment is located without any changes made to it.
 └── tslint.json
 ```
 
-### backend
+### /backend
 
 ```
 .
@@ -253,7 +254,7 @@ This is where the original assignment is located without any changes made to it.
 ├── tslint.json
 ```
 
-### tooling
+### /tooling
 
 This is where I refactored the original `unwind` and `unwind_test`
 
@@ -268,7 +269,7 @@ This is where I refactored the original `unwind` and `unwind_test`
 └── tslint.json
 ```
 
-### data
+### /data
 
 Contains the data dump as well as the shared volumes for the containers.
 
@@ -296,7 +297,7 @@ See: [README.md](frontend/README.md)
 
 ## References
 
-Here are some references in alphabetical order.
+Here are some references you might be interested in listed by alphabetical order.
 
 * [Angular](https://angular.io)
 * [Async](https://caolan.github.io/async/v3)
