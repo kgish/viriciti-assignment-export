@@ -172,10 +172,40 @@ GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
 
 ## Rate limiter
 
+Throttling the API calls is done using the [Node Rate Limiter](https://github.com/animir/node-rate-limiter-flexible) library.
+
+In order to configure the available options, update the appropriate yaml file in the config directory.
+
+src/config/rate-limiter.ts
+```
+import * as config from 'config';
+
+const rlConfig = config.get('rate-limiter');
+
+export const rateLimiterConfig = {
+    type: process.env.RATE_LIMITER_TYPE || rlConfig.type,
+    points: process.env.RATE_LIMITER_POINTS || rlConfig.points,
+    duration: process.env.RATE_LIMITER_DURATION || rlConfig.duration,
+    keyprefix: process.env.RATE_LIMITER_KEYPREFIX || rlConfig.keyprefix,
+};
+```
+where
+
+* type: memory, cluster, redis or mongodb (default: memory)
+* points: Maximum number of points can be consumed over duration (default: 4).
+* duration: Number of seconds before consumed points are reset (default: 1).
+* keyprefix: If you need to create several limiters for different purpose (default: rlflx).
+
+In order to enable it for a given controller or globally, use the following decorator.
+
 ```
 @UseInterceptors(RateLimiterInterceptor)
 
 ```
+
+## Testing
+
+TODO
   
 ## References
 

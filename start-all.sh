@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # ----------------------------------------------------------------------------
 #
 # Syntax:
@@ -16,5 +15,5 @@ docker-compose down -v
 docker-compose down -v
 docker-compose up -d
 
-cd ../frontend
-npm run start:hmr
+(cd backend && npm run start:dev) &
+(cd frontend && npm run start:hmr) &

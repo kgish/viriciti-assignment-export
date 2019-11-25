@@ -40,10 +40,10 @@ These are the steps that I took in order to tackle this challenging assignment:
 * Rewrite the unwind utility and test in ES6 using TypeScript.
 * Verify that the rewriten test works using a test MongoDB.
 * Create a MongDB docker container and import the data dump.
-* Tried to learn [Express Gateway](https://www.express-gateway.io)
-* Decided instead to use [NestJS](https://nestjs.com).
+* Tried to learn [Express Gateway](https://www.express-gateway.io) but not enough time
+* Decided instead to use [NestJS](https://nestjs.com) which is more familiar to me.
 * Build the backend API server.
-* Learn [Redis](https://redis.io).
+* Learn [Redis](https://redis.io) quickly.
 * Create a Redis docker container and use it as a cache.
 * Build a responsive [Angular](https://angular.io) frontend with [Material CDK](https://material.angular.io).
 * Dockerize everything.
@@ -52,7 +52,7 @@ These are the steps that I took in order to tackle this challenging assignment:
 
 ## Prerequisites
 
-You will have to have knowledge of the following and have the relevant items installed.
+You should have some knowledge of the following and have the relevant items installed.
 
 * Git
 * Docker
@@ -62,7 +62,10 @@ You will have to have knowledge of the following and have the relevant items ins
 * Postgres
 * MongoDB
 * Redis
-* D3.js
+* Chartjs
+* Jasmine
+* Chai
+* Jest
 
 
 ## Architecture
@@ -278,6 +281,10 @@ Contains the data dump as well as the shared volumes for the containers.
 └── dump
 
 ```
+
+## Tooling
+
+See: [README.md](tooling/README.md)
 
 ## Backend
 
