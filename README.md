@@ -62,6 +62,7 @@ You will have to have knowledge of the following and have the relevant items ins
 * Postgres
 * MongoDB
 * Redis
+* D3.js
 
 
 ## Architecture
