@@ -225,8 +225,4 @@ $ npm run test:e2e
 * [Node Rate Limiter](https://github.com/animir/node-rate-limiter-flexible)
 * [Redis for NestJS](https://docs.nestjs.com/microservices/redis)
 * [Caching a MongoDB Database with Redis](https://codeforgeek.com/caching-a-mongodb-database-with-redis)
-* [Docker](https://www.docker.com)
-* Docker Hub
-    * [Postgres](https://hub.docker.com/_/postgres)
-    * [Mongo](https://hub.docker.com/_/mongo)
-    * [Redis](https://hub.docker.com/_/redis)
+

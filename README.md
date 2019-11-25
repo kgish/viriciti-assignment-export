@@ -43,6 +43,7 @@ These are the steps that I took in order to tackle this challenging assignment:
 * Tried to learn [Express Gateway](https://www.express-gateway.io) but not enough time
 * Decided instead to use [NestJS](https://nestjs.com) which is more familiar to me.
 * Build the backend API server.
+* Check out [Balena](https://www.balena.io) (formerly resin.io) but too little time.
 * Learn [Redis](https://redis.io) quickly.
 * Create a Redis docker container and use it as a cache.
 * Build a responsive [Angular](https://angular.io) frontend with [Material CDK](https://material.angular.io).
@@ -301,7 +302,12 @@ Here are some references you might be interested in listed by alphabetical order
 
 * [Angular](https://angular.io)
 * [Async](https://caolan.github.io/async/v3)
+* [Balena](https://www.balena.io)
 * [CoffeeScript](https://coffeescript.org)
+* [Docker](https://www.docker.com)
+    * [Postgres](https://hub.docker.com/_/postgres)
+    * [Mongo](https://hub.docker.com/_/mongo)
+    * [Redis](https://hub.docker.com/_/redis)
 * [ECMAScript 6](http://es6-features.org)
 * [Exports assignment](https://github.com/viriciti/exports-assignment)
 * [Express Gateway](https://www.express-gateway.io)
@@ -315,3 +321,4 @@ Here are some references you might be interested in listed by alphabetical order
 * [Redis](https://redis.io)
 * [TypeScript](https://www.typescriptlang.org)
 * [UnderscoreJS](https://underscorejs.org)
+
