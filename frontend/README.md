@@ -101,10 +101,18 @@ proxy.conf.json
 }
 ```
 
-## Theming
+## Theme
 
-I did my best to implement a pseudo Viriciti (green) house style but admit that it is not perfect. Fortunately, once you know the defined color palettes,
-Material Design makes it very easy to implement.
+I did my best to implement a pseudo Viriciti (green) house-style but admit that it is not perfect. Fortunately, once you know the defined color palettes, Material Design makes it very easy to implement.
+
+Have a look in the styles directory.
+
+```
+styles
+├── main.scss
+├── theme.scss
+└── viriciti.scss
+```
 
 ## Utils
 
@@ -120,7 +128,7 @@ The `lib/utils` directory contains a number of useful utilities.
 
 The user can download a csv document by clicking on the download button.
 
-The file name is formatted as `${vehicle_name}-from_date-to_date.csv`
+The file name is formatted as `${vehicle_name}-${from_date}-${to_date}.csv`
 
 Uses the [export-to-csv](https://www.npmjs.com/package/export-to-csv) library.
 

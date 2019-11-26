@@ -219,6 +219,7 @@ Verify that everything has been installed correctly by running the following tes
 
 ```
 $ docker-compose up -d
+$ more stuff goes here ...
 $ docker-compose down -v
 ```
 
@@ -252,21 +253,22 @@ This is where all of the code related to the Angular project is kept.
 ├── src
 │   ├── app
 │   │   ├── app*.*
-│   │   ├── components
-│   │   ├── guards
-│   │   ├── interceptors
-│   │   ├── lib
-│   │   ├── modules
-│   │   ├── pages
-│   │   ├── pipes
-│   │   └── services
+│   │   ├── components/
+│   │   ├── guards/
+│   │   ├── interceptors/
+|   │   ├── lib
+│   |   │   └── utils/
+│   │   ├── modules/
+│   │   ├── pages/
+│   │   ├── pipes/
+│   │   └── services/
 │   ├── assets/
 │   ├── environments/
 │   ├── hmr.ts
 │   ├── index.html
 │   ├── main.ts
 │   ├── polyfills.ts
-│   ├── styles.scss
+│   ├── styles/
 │   └── test.ts
 ├── tsconfig.*
 └── tslint.json
@@ -347,6 +349,19 @@ See: [README.md](backend/README.md)
 ## Frontend
 
 See: [README.md](frontend/README.md)
+
+## Possible improvements
+
+In the limited time I had to implement this assignment, there was not enough time to optimize and perfect things.
+
+Therefore, here is a list of possible additional work for a future rainy day.
+
+* Implement BSON to compress the results on the backend and uncompress the results on the frontend.
+* Measure performance frontend and backend and tweak the code accordingly.
+* Optimize Redis configuration options.
+* Optimize MongoDB configuration options.
+* Allow interval slices less than a day, for example blocks of hours or minutes even.
+* Create a separate microservice for handling the Redis caching.
 
 ## References
 

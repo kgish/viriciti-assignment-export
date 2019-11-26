@@ -1,8 +1,9 @@
+@import '../../../styles/viriciti';
+
 .mat-toolbar {
-  background-color: #7CA363;
   height: 52px;
   color: #fff;
-  border-bottom: 2px solid darkgray;
+  border-bottom: 2px solid $viricity-dark;
 }
 
 .logo {

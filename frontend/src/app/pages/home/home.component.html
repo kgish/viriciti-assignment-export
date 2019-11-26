@@ -1,4 +1,4 @@
-<div class="page-header" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center" >
+<div class="page-header" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start center">
   <mat-icon>home</mat-icon>
   <span class="title">{{title}}</span>
 </div>
@@ -50,8 +50,8 @@
       </mat-form-field>
 
       <div fxLayout fxLayoutGap="10px">
-        <button mat-raised-button type="submit" [disabled]="form.invalid">Submit</button>
-        <button mat-raised-button color="secondary" [disabled]="!values || !values.length" (click)="onDownload()">
+        <button mat-raised-button color="secondary" type="submit" [disabled]="form.invalid">Submit</button>
+        <button mat-raised-button [disabled]="!values || !values.length" (click)="onDownload()">
           Download
         </button>
       </div>
@@ -154,7 +154,7 @@
               <canvas class="chart" id="current-chart">{{ currentChart }}</canvas>
             </div>
           </mat-tab>
-            <mat-tab>
+          <mat-tab>
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">dashboard</mat-icon>
               Odo
