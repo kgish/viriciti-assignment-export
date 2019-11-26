@@ -106,6 +106,15 @@ proxy.conf.json
 I did my best to implement a pseudo Viriciti (green) house style but admit that it is not perfect. Fortunately, once you know the defined color palettes,
 Material Design makes it very easy to implement.
 
+## Utils
+
+The `lib/utils` directory contains a number of useful utilities.
+
+* date-format: a collection of tools for formatting the date column in the data table.
+* export-to-csv: exports json to a csv file for downloading.
+* get-form-error: generic error messages for form validation.
+* aggregate-times: filter for displaying time intervals data table.
+
 
 ## Export
 

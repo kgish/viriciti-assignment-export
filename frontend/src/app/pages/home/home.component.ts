@@ -13,16 +13,11 @@ import {
 } from '../../services';
 
 import {
-  dateYYYY,
-  dateYYYYMM,
-  dateYYYYMMDD,
-  dateYYYYMMDDHH0000,
-  dateYYYYMMDDHHMM00,
-  dateYYYYMMDDHHMMSS,
-  exportToCsv
+  exportToCsv,
+  aggregateTimes
 } from '../../lib';
 
-import { Unit, unitIntervals } from '../../global.types';
+import { Unit } from '../../global.types';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 
 interface IPoint {
@@ -81,15 +76,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     { name: 'odo', checked: false },
     { name: 'voltage', checked: false },
   ];
-
-  filters = {
-    year: dateYYYY,
-    month: dateYYYYMM,
-    day: dateYYYYMMDD,
-    hour: dateYYYYMMDDHH0000,
-    min: dateYYYYMMDDHHMM00,
-    sec: dateYYYYMMDDHHMMSS,
-  };
 
   chartNames = [ 'soc', 'speed', 'current', 'odo', 'voltage' ];
 
@@ -247,108 +233,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   _resetDataSource(): IValue[] {
 
-    const resetList = (bookmark, t) => {
-      console.log(`resetList() bookmark='${ JSON.stringify(bookmark) }' t='${t}'`);
-      const result = {
-        time: t,
-        soc: bookmark.soc.value,
-        speed: bookmark.speed.value,
-        current: bookmark.current.value,
-        odo: bookmark.speed.value,
-        voltage: bookmark.speed.value
-      };
-      console.log(`resetList() result='${ JSON.stringify(result) }'`);
-      return result;
-    };
-
-    const updateList = (list, t) => {
-      console.log(`updateList() list='${ JSON.stringify(list) }' t='${t}'`);
-      const result = list[t];
-      console.log(JSON.stringify(result));
-      this.attributes.forEach(a => {
-        const name = a.name;
-        console.log(`name='${ name }' list='${ result[name] }'`);
-        console.log(`before: list='${ result[name] }'`);
-        if (result[name]) {
-          result[name] /= unitIntervals[this.currentUnit];
-        }
-        console.log(`after:  list='${ result[name] }'`);
-      });
-      console.log(`updateList() result='${ JSON.stringify(result) }'`);
-      return result;
-    };
-
-    if (!this.values || !this.values.length) {
-      return [];
-    }
-
     let filteredValues = this.values;
 
+    if (!this.values || !this.values.length) {
+      return filteredValues;
+    }
+
     if (this.currentUnit !== 'msec') {
-      const filter = this.filters[this.currentUnit];
-      const list = {};
-      filteredValues = [];
-
-      // Setup all the initial values
-      const v0 = this.values[0];
-      const t0 = v0.time;
-      const bookmark = {
-        time: t0,
-        soc: { time: v0.soc === null ? null : t0, value: v0.soc },
-        speed: { time: v0.speed === null ? null : t0, value: v0.speed },
-        current: { time: v0.current === null ? null : t0, value: v0.current },
-        odo: { time: v0.odo === null ? null : t0, value: v0.odo },
-        voltage: { time: v0.voltage === null ? null : t0, value: v0.voltage },
-      };
-
-      list[filter(new Date(t0))] = { time: t0, soc: null, speed: null, current: null, odo: null, voltage: null };
-
-      const num = this.values.length;
-      this.values.slice(1).forEach((v, idx) => {
-        const vtime: number = v.time;
-        const t = filter(new Date(vtime));
-        if (!list[t]) {
-          // Finished previous time interval
-          list[t] = resetList(bookmark, vtime);
-          const tprev = filter(new Date(bookmark.time));
-          list[tprev] = updateList(list, tprev);
-        }
-        this.attributes.forEach(a => {
-          const name: string = a.name;
-          const vvalue: number = v[name];
-          if (vvalue !== null) {
-            if (bookmark[name].time !== null) {
-              const diff = vtime - bookmark[name].time;
-              // console.log(`name='${ name }' value='${ vvalue }' time='${ vtime }' bookmark='${ bookmark[name].time }' diff='${ diff }'`);
-              // console.log(`before list='${ list[t][name] }'`);
-              list[t][name] += diff * vvalue;
-              // console.log(`after list='${ list[t][name] }'`);
-            }
-            bookmark[name].time = vtime;
-            bookmark[name].value = vvalue;
-          }
-        });
-
-        if (idx === num - 1) {
-          // We've reached the end of the data.
-          list[t] = updateList(list, t);
-        } else {
-          // Still going strong.
-          bookmark.time = vtime;
-        }
-      });
-
-      Object.keys(list).sort().forEach(time => {
-        const v = list[time];
-        filteredValues.push({
-          time: v.time,
-          soc: v.soc,
-          speed: v.speed,
-          current: v.current,
-          odo: v.odo,
-          voltage: v.voltage,
-        });
-      });
+      filteredValues = aggregateTimes(this.values, this.currentUnit);
     }
 
     // If one or more of the attribute checkboxes are checked, then filter out those
