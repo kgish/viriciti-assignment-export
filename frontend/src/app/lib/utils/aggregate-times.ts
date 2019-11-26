@@ -33,48 +33,44 @@ export function aggregateTimes(data: IValue[], unit: Unit): IValue[] {
 
   const attributes: string[] = Object.keys(v0).filter(key => key !== 'time');
 
-  const bookmark = {
-    time: t0,
-    soc: { time: v0.soc === null ? null : t0, value: v0.soc },
-    speed: { time: v0.speed === null ? null : t0, value: v0.speed },
-    current: { time: v0.current === null ? null : t0, value: v0.current },
-    odo: { time: v0.odo === null ? null : t0, value: v0.odo },
-    voltage: { time: v0.voltage === null ? null : t0, value: v0.voltage },
-  };
+  const bookmark = { time: t0 };
+  attributes.forEach(attr => bookmark[ attr ] = { time: v0[ attr ] === null ? null : v0[ attr ], value: v0[ attr ] });
 
   list[ filter(new Date(t0)) ] = { time: t0, soc: null, speed: null, current: null, odo: null, voltage: null };
 
-  const num = data.length;
-  data.slice(1).forEach((v, idx) => {
-    const vtime: number = v.time;
-    const t = filter(new Date(vtime));
+  // Important: takes next slice(1) into account.
+  const num = data.length - 1;
+
+  data.slice(1).forEach((d, idx) => {
+    const dt: number = d.time;
+    const t: string = filter(new Date(dt));
     if (!list[ t ]) {
       // Finished previous time unit
-      list[ t ] = resetList(bookmark, vtime, attributes);
+      list[ t ] = createList(bookmark, dt, attributes);
       const tprev = filter(new Date(bookmark.time));
-      list[ tprev ] = updateList(list, tprev, unit, attributes);
+      list[ tprev ] = finalizeList(list, tprev, unit, attributes);
     }
-    attributes.forEach(name => {
-      const vvalue: number = v[ name ];
-      if (vvalue !== null) {
-        if (bookmark[ name ].time !== null) {
-          const diff = vtime - bookmark[ name ].time;
-          console.log(`${fx} name='${name}' value='${vvalue}' time='${vtime}' bookmark.time='${bookmark[ name ].time}' diff='${diff}'`);
-          console.log(`${fx} BEFORE: list='${list[ t ][ name ]}'`);
-          list[ t ][ name ] += diff * vvalue;
-          console.log(`${fx} AFTER:  list='${list[ t ][ name ]}'`);
+    attributes.forEach(attr => {
+      const dv: number = d[ attr ];
+      if (dv !== null) {
+        if (bookmark[ attr ].time !== null) {
+          const diff = dt - bookmark[ attr ].time;
+          console.log(`${fx} attr='${attr}' value='${dv}' time='${dt}' bookmark.time='${bookmark[ attr ].time}' diff='${diff}'`);
+          console.log(`${fx} BEFORE: list='${list[ t ][ attr ]}'`);
+          list[ t ][ attr ] += diff * dv;
+          console.log(`${fx} AFTER:  list='${list[ t ][ attr ]}'`);
         }
-        bookmark[ name ].time = vtime;
-        bookmark[ name ].value = vvalue;
+        bookmark[ attr ].time = dt;
+        bookmark[ attr ].value = dv;
       }
     });
 
     if (idx === num - 1) {
       // We've reached the end of the data.
-      list[ t ] = updateList(list, t, unit, attributes);
+      list[ t ] = finalizeList(list, t, unit, attributes);
     } else {
       // Still going strong.
-      bookmark.time = vtime;
+      bookmark.time = dt;
     }
   });
 
@@ -86,29 +82,35 @@ export function aggregateTimes(data: IValue[], unit: Unit): IValue[] {
   return result;
 }
 
-const resetList = (bookmark, time, attributes) => {
-  const fx = `${fn} resetList()`;
-  console.log(`${fx} bookmark='${JSON.stringify(bookmark)}' time='${time}'`);
-  const result = { time };
+// Create a new list for given time and set to current bookmark value
+// for restarting the new time interval.
+const createList = (bookmark, time, attributes) => {
+  const fx = `${fn} createList()`;
+  console.log(`${fx} bookmark='${JSON.stringify(bookmark)}' time='${time}' attributes='${attributes}'`);
 
-  attributes.forEach(name => result[ name ] = bookmark[ name ].value);
+  const result = { time };
+  attributes.forEach(attr => result[ attr ] = bookmark[ attr ].value);
 
   console.log(`${fx} result='${JSON.stringify(result)}'`);
   return result;
 };
 
-const updateList = (list, t, unit: Unit, attributes: string[]) => {
-  const fx = `${fn} updateList()`;
+// Finalize the previous list by calculating the averages of all
+// attributes within the previous time slot. This occurs when
+// either the next time interval or the end of the last interval
+// has been detected.
+const finalizeList = (list, t, unit: Unit, attributes: string[]) => {
+  const fx = `${fn} finalizeList()`;
 
-  console.log(`${fx} list='${JSON.stringify(list)}' t='${t}'`);
+  console.log(`${fx} list='${JSON.stringify(list)}' t='${t}' unit='${unit}' attributes='${attributes}'`);
   const result = list[ t ];
   console.log(`${fx} BEFORE: result='${JSON.stringify(result)}'`);
-  attributes.forEach(name => {
-    console.log(`${fx} name='${name}' BEFORE: list='${result[ name ]}'`);
-    if (result[ name ]) {
-      result[ name ] /= unitIntervals[ unit ];
+  attributes.forEach(attr => {
+    console.log(`${fx} attr='${attr}' BEFORE: result='${result[ attr ]}'`);
+    if (result[ attr ]) {
+      result[ attr ] /= unitIntervals[ unit ];
     }
-    console.log(`${fx} name='${name}' AFTER:  list='${result[ name ]}'`);
+    console.log(`${fx} attr='${attr}' AFTER:  result='${result[ attr ]}'`);
   });
   console.log(`${fx} AFTER:  result='${JSON.stringify(result)}'`);
   return result;
