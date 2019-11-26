@@ -243,6 +243,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Private
 
+  // Only enable the table header checkboxes if non-null values present.
   _enableCheckboxes() {
     if (!this.values || !this.values.length) {
       return;
@@ -263,7 +264,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.currentUnit !== 'msec') {
-      filteredValues = aggregateTimes(this.values, this.currentUnit);
+      const enabled = this.attributes.filter(attr => !attr.disabled).map(attr => attr.name);
+      filteredValues = aggregateTimes(this.values, this.currentUnit, enabled);
     }
 
     // If one or more of the attribute checkboxes are checked, then filter out those

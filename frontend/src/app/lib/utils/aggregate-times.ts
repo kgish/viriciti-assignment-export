@@ -20,12 +20,14 @@ const filters = {
 
 const fn = 'aggregateTimes';
 
-export function aggregateTimes(data: IValue[], unit: Unit): IValue[] {
+export function aggregateTimes(data: IValue[], unit: Unit, enabled: string[]): IValue[] {
   const result: IValue[] = [];
   const filter = filters[ unit ];
   const list = {};
 
   const fx = `${fn} aggregateTimes()`;
+
+  console.log(`${fx} unit='${unit}' enabled='${JSON.stringify(enabled)}'`);
 
   // Setup all the initial values
   const v0 = data[ 0 ];
