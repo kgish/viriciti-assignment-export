@@ -2,7 +2,7 @@
 
 .page-header {
   padding-top: 1rem;
-  //color: $viriciti-green;
+  color: $viriciti-green;
 
   .title {
     font-size: 1.5em;
@@ -13,17 +13,39 @@
   margin-top: 0.5rem;
 }
 
+.header-row {
+  padding: 5px;
+}
+
 form {
   padding: 10px;
   width: 100%;
+
+  .mat-form-field {
+    width: 100%;
+    margin-right: 30px !important;
+  }
+}
+
+.mat-radio-group {
+  white-space: nowrap;
 }
 
 table {
   width: 100%;
+  table-layout: fixed;
 
   th,
   td {
     padding-left: 0.5rem;
+    width: 10%;
+  }
+
+  th:nth-child(1),
+  th:nth-child(2),
+  td:nth-child(1),
+  td:nth-child(2) {
+    width: 25%;
   }
 }
 
@@ -42,7 +64,7 @@ table {
 }
 
 button[type=submit] {
-  //background-color: $viriciti-green;
+  background-color: $viriciti-green;
   color: #fff;
 }
 
@@ -50,3 +72,12 @@ mat-icon {
   color: $viriciti-green;
   font-weight: bold;
 }
+
+.filter {
+  max-width: 150px;
+}
+
+.mat-checkbox-disabled {
+  cursor: not-allowed;
+}
+

@@ -34,6 +34,7 @@ interface IDataValues {
 interface ICheckbox {
   name: string;
   checked: boolean;
+  disabled: boolean;
 }
 
 @Component({
@@ -70,11 +71,11 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   currentUnit: Unit = 'msec';
 
   attributes: ICheckbox[] = [
-    { name: 'soc', checked: false },
-    { name: 'speed', checked: false },
-    { name: 'current', checked: false },
-    { name: 'odo', checked: false },
-    { name: 'voltage', checked: false },
+    { name: 'soc', checked: false, disabled: true },
+    { name: 'speed', checked: false, disabled: true },
+    { name: 'current', checked: false, disabled: true },
+    { name: 'odo', checked: false, disabled: true },
+    { name: 'voltage', checked: false, disabled: true },
   ];
 
   chartNames = [ 'soc', 'speed', 'current', 'odo', 'voltage' ];
@@ -97,10 +98,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscription = this.vehiclesService.getVehicles().subscribe(vehicles => {
       this.vehicles = vehicles;
       if (vehicles.length) {
-        this.form.get('vehicle').setValue(vehicles[ 0 ]);
+        this.form.get('vehicle').setValue(vehicles[0]);
       } else {
         this.snackbar.open(
-          'No vehicles found, please ensure that MongoDB is running and has been seeded with data.',
+          'No vehicles found, either signin or ensure MongoDB is running and has been seeded with data.',
           'X', { duration: 5000 });
       }
     });
@@ -130,15 +131,16 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const vehicle: IVehicle = this.form.value.vehicle;
     const fromDate: Date = this.form.value.fromDate;
     const toDate: Date = this.form.value.toDate;
-    console.log(`onSubmit() value='${JSON.stringify(vehicle)}' fromDate='${fromDate}' toDate='${toDate}'`);
+    console.log(`onSubmit() value='${ JSON.stringify(vehicle) }' fromDate='${ fromDate }' toDate='${ toDate }'`);
     this.loading = true;
     const tm = +(new Date());
     setTimeout(() => {
       this.vehiclesService.getVehicleValues(vehicle, fromDate, toDate)
         .subscribe(values => {
             this.values = values;
+            this._enableCheckboxes();
             this._resetDataSource();
-            this.snackbar.open(`Fetched ${values.length} records in ${+(new Date()) - tm} msecs.`, 'X', { duration: 5000 });
+            this.snackbar.open(`Fetched ${ values.length } records in ${ +(new Date()) - tm } msecs.`, 'X', { duration: 5000 });
           },
           error => console.log(error),
           () => this.loading = false
@@ -172,14 +174,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const checked = event.checked;
     const source = event.source;
     const name = source.name;
-    console.log(`changeAttribute() name='${name}' checked='${checked}'`);
+    console.log(`changeAttribute() name='${ name }' checked='${ checked }'`);
     const found = this.attributes.find(a => a.name === name);
     if (found) {
       found.checked = checked;
     } else {
-      console.error(`changeAttribute() invalid name='${name}'`);
+      console.error(`changeAttribute() invalid name='${ name }'`);
     }
-    console.log(`changeAttribute() attributes='${JSON.stringify(this.attributes)}'`);
+    console.log(`changeAttribute() attributes='${ JSON.stringify(this.attributes) }'`);
     this._resetDataSource();
   }
 
@@ -192,9 +194,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+  getAttribute(name: string): ICheckbox {
+    return this.attributes.find(attr => attr.name === name);
+  }
+
+  disabledAttribute(name: string): boolean {
+    return this.getAttribute(name).disabled;
+  }
+
   selectedIndexChange(event: number) {
 
-    const chart = this.chartNames[ event ];
+    const chart = this.chartNames[event];
 
     const type = 'line';
 
@@ -219,7 +229,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       // console.log(`miny='${ miny }' maxy='${ maxy }'`);
       // console.log(data);
 
-      this.socChart = new Chart(`${chart}-chart`, {
+      this.socChart = new Chart(`${ chart }-chart`, {
         type,
         data: {
           labels: [],
@@ -232,6 +242,17 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Private
+
+  _enableCheckboxes() {
+    if (!this.values || !this.values.length) {
+      return;
+    }
+
+    this.attributes.forEach(attr => {
+      const name = attr.name;
+      this.getAttribute(name).disabled = !this.values.some(v => v[name] !== null);
+    });
+  }
 
   _resetDataSource(): IValue[] {
 
@@ -249,7 +270,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     // records which contain null values for those checked attributes.
     const checked = this.attributes.filter(a => a.checked).map(v => v.name);
     if (checked.length) {
-      filteredValues = filteredValues.filter(v => checked.every(a => v[ a ] !== null));
+      filteredValues = filteredValues.filter(v => checked.every(a => v[a] !== null));
     }
 
     this.dataSource.data = filteredValues;
@@ -280,7 +301,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     let first = true;
     this.values.forEach(v => {
       const x = v.time;
-      const y = v[ chart ];
+      const y = v[chart];
       if (y !== null) {
         if (first) {
           if (result.miny > y) {

@@ -2,7 +2,44 @@
 
 ## Introduction
 
-TODO
+In this project, I refactored the original coffeeScript `unwind.coffee` and `unwind_test.coffee` files from the original 
+assignment and converted them with TypeScript.
+
+This was useful as I could better understand what these scripts do as well testing ore robust code which is type
+checked and conforms better to the newer ES6 standards.
+
+## Directory
+
+The directory structure looks like this.
+
+```
+.
+├── dist
+│   ├── app.js
+│   ├── app.js.map
+│   └── lib
+│       ├── unwind.stream.js
+│       └── unwind.stream.js.map
+├── package.json
+├── package-lock.json
+├── README.md
+├── src
+│   ├── app.ts
+│   └── lib
+│       └── unwind.stream.ts
+├── tsconfig.json
+└── tslint.json
+```
+
+The `app.ts` is the main node program which does the following:
+
+* read config
+* read and verify args
+* connect to MongoDB if possible
+* get vehicle stats: soc, speed, current, odo, voltage
+* collate results and order by date
+* generate a csv file
+
 
 ## Test
 
@@ -41,12 +78,44 @@ Run the test.
 
 ```
 $ npm start
+vehicle='vehicle_001' fromDate='2018-10-01' toDate='2018-10-02'
+Opened connection to database
+getStats(soc) => OK
+getStats(speed) => OK
+getStats(current) => OK
+getStats(odo) => OK
+getStats(voltage) => OK
+handleConnectSuccess() => OK
+handleResults() => wrote 182171 results to vehicle_001_2018-10-01_2018-10-02.csv
+Closed connection to database
+Total processing time: 1523ms
 ```
 
-Cleanup.
+The csv file which is generated is called `vehicle_001_2018-10-01_2018-10-02.csv`.
+
+Finally, you should cleanup.
 
 ```
 $ docker-compose down mongo-test
 ```
+
+## Run
+
+If you would prefer using a different vehicle and date range, run the following command.
+
+```
+$ ./node_modules/.bin/tsc && node dist/app.js vehicle_00N fromDate toDate
+```
+
+where
+```
+N = 1,2,3
+fromDate = YYYY-MM-DD
+toDate = YYYY-MM-DD
+```
+
+The csv file which is generated will be called `vehicle_00N_YYYY-MM-DD_.csv`.
+
+## Conclusion
 
 That's all for now folks.

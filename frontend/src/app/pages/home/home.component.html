@@ -5,59 +5,56 @@
 
 <p class="description">Time to do something fun and exciting.</p>
 
-<div class="mat-elevation-z2">
+<div class="mat-elevation-z4">
 
   <div class="header-row">
     <form [formGroup]="form" fxLayout fxLayoutGap="10px" fxLayoutAlign="space-between center" (ngSubmit)="onSubmit()">
-      <mat-form-field>
-        <mat-select formControlName="vehicle" placeholder="Vehicle">
-          <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle">
-            {{vehicle.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div fxFlex fxLayout fxLayoutGap="10px" fxLayoutAlign="start center">
+        <mat-form-field>
+          <mat-select formControlName="vehicle" placeholder="Vehicle">
+            <mat-option *ngFor="let vehicle of vehicles" [value]="vehicle">
+              {{vehicle.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field>
-        <label for="from-date"></label>
-        <input id="from-date" matInput [min]="minDate" [max]="maxDate" formControlName="fromDate"
-               [matDatepicker]="fromDate"
-               placeholder="From" readonly>
-        <mat-datepicker-toggle matSuffix [for]="fromDate"></mat-datepicker-toggle>
-        <mat-datepicker #fromDate [startAt]="minDate"></mat-datepicker>
-      </mat-form-field>
+        <mat-form-field>
+          <label for="from-date"></label>
+          <input id="from-date" matInput [min]="minDate" [max]="maxDate" formControlName="fromDate"
+                 [matDatepicker]="fromDate"
+                 placeholder="From" readonly>
+          <mat-datepicker-toggle matSuffix [for]="fromDate"></mat-datepicker-toggle>
+          <mat-datepicker #fromDate [startAt]="minDate"></mat-datepicker>
+        </mat-form-field>
 
-      <mat-form-field>
-        <label for="to-date"></label>
-        <input id="to-date" matInput [min]="minDate" [max]="maxDate" formControlName="toDate" [matDatepicker]="toDate"
-               placeholder="To" readonly>
-        <mat-datepicker-toggle matSuffix [for]="toDate"></mat-datepicker-toggle>
-        <mat-datepicker #toDate [startAt]="minDate"></mat-datepicker>
-      </mat-form-field>
-
-      <div class="attributes">
-        <mat-checkbox [disabled]="!values || !values.length" *ngFor="let attribute of attributes" [name]="attribute.name" (change)="changeAttribute($event)" class="attribute">{{attribute.name}}</mat-checkbox>
+        <mat-form-field>
+          <label for="to-date"></label>
+          <input id="to-date" matInput [min]="minDate" [max]="maxDate" formControlName="toDate" [matDatepicker]="toDate"
+                 placeholder="To" readonly>
+          <mat-datepicker-toggle matSuffix [for]="toDate"></mat-datepicker-toggle>
+          <mat-datepicker #toDate [startAt]="minDate"></mat-datepicker>
+        </mat-form-field>
       </div>
 
-      <mat-radio-group>
-        <div class="units">
-          <mat-radio-button [disabled]="!values || !values.length" class="unit" *ngFor="let unit of units; let idx = index" [value]="unit"
+      <div fxFlex fxLayout fxLayoutGap="10px" fxLayoutAlign="center center">
+        <mat-radio-group [class.hidden]="loading || !values || !values.length">
+          <mat-radio-button class="unit"
+                            *ngFor="let unit of units; let idx = index" [value]="unit"
                             [checked]="idx === 0" (change)="unitChanged($event)">{{unit}}</mat-radio-button>
-        </div>
-      </mat-radio-group>
+        </mat-radio-group>
+      </div>
 
-      <mat-form-field>
-        <input [disabled]="!values || !values.length" matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-      </mat-form-field>
-
-      <div fxLayout fxLayoutGap="10px">
-        <button mat-raised-button color="secondary" type="submit" [disabled]="form.invalid">Submit</button>
+      <div fxFlex fxLayout fxLayoutGap="10px" fxLayoutAlign="end center">
+        <mat-form-field class="filter" [class.hidden]="loading || !values || !values.length">
+          <input matInput (keyup)="applyFilter($event.target.value)"
+                 placeholder="Filter">
+        </mat-form-field>
+        <button mat-raised-button type="submit" [disabled]="form.invalid">Submit</button>
         <button mat-raised-button [disabled]="!values || !values.length" (click)="onDownload()">
           Download
         </button>
       </div>
     </form>
-
-    <mat-progress-bar class="progress-bar" *ngIf="loading" mode="indeterminate"></mat-progress-bar>
   </div>
 
   <div [class.hidden]="loading || !values || !values.length">
@@ -84,31 +81,57 @@
 
           <!-- Soc column -->
           <ng-container matColumnDef="soc">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Soc</th>
-            <td mat-cell *matCellDef="let element">{{element.soc | number}}</td>
+            <th mat-header-cell [disabled]="disabledAttribute('soc')" *matHeaderCellDef mat-sort-header>
+              <mat-checkbox name="soc" [disabled]="disabledAttribute('soc')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+                            class="attribute">
+                soc
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{element.soc | number}}</td>
           </ng-container>
 
           <!-- Speed column -->
           <ng-container matColumnDef="speed">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Speed</th>
+            <th mat-header-cell [disabled]="disabledAttribute('speed')" *matHeaderCellDef mat-sort-header>
+              <mat-checkbox name="speed" [disabled]="disabledAttribute('speed')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+                            class="attribute">
+                speed
+              </mat-checkbox>
+            </th>
             <td mat-cell *matCellDef="let element">{{element.speed | number}}</td>
           </ng-container>
 
           <!-- Current column -->
           <ng-container matColumnDef="current">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Current</th>
+            <th mat-header-cell [disabled]="disabledAttribute('current')" *matHeaderCellDef mat-sort-header>
+              <mat-checkbox name="current" [disabled]="disabledAttribute('current')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+                            class="attribute">
+                current
+              </mat-checkbox>
+            </th>
             <td mat-cell *matCellDef="let element">{{element.current | number}}</td>
           </ng-container>
 
           <!-- Odo column -->
           <ng-container matColumnDef="odo">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Odo</th>
+            <th mat-header-cell [disabled]="disabledAttribute('odo')" *matHeaderCellDef mat-sort-header>
+              <mat-checkbox name="odo" [disabled]="disabledAttribute('odo')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+                            class="attribute">
+                odo
+              </mat-checkbox>
+            </th>
             <td mat-cell *matCellDef="let element">{{element.odo | number}}</td>
           </ng-container>
 
           <!-- Voltage column -->
           <ng-container matColumnDef="voltage">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>voltage</th>
+            <th mat-header-cell [disabled]="disabledAttribute('voltage')" *matHeaderCellDef mat-sort-header>
+              <mat-checkbox name="voltage" [disabled]="disabledAttribute('voltage')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+                            class="attribute">
+                voltage
+              </mat-checkbox>
+            </th>
             <td mat-cell *matCellDef="let element">{{element.voltage | number}}</td>
           </ng-container>
 
@@ -180,3 +203,4 @@
   </div>
 
 </div>
+<mat-progress-bar class="progress-bar" *ngIf="loading" mode="indeterminate"></mat-progress-bar>

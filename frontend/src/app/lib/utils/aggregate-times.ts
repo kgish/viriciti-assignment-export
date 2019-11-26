@@ -55,10 +55,10 @@ export function aggregateTimes(data: IValue[], unit: Unit): IValue[] {
       if (dv !== null) {
         if (bookmark[ attr ].time !== null) {
           const diff = dt - bookmark[ attr ].time;
-          console.log(`${fx} attr='${attr}' value='${dv}' time='${dt}' bookmark.time='${bookmark[ attr ].time}' diff='${diff}'`);
-          console.log(`${fx} BEFORE: list='${list[ t ][ attr ]}'`);
+          // console.log(`${fx} attr='${attr}' value='${dv}' time='${dt}' bookmark.time='${bookmark[ attr ].time}' diff='${diff}'`);
+          // console.log(`${fx} BEFORE: list='${list[ t ][ attr ]}'`);
           list[ t ][ attr ] += diff * dv;
-          console.log(`${fx} AFTER:  list='${list[ t ][ attr ]}'`);
+          // console.log(`${fx} AFTER:  list='${list[ t ][ attr ]}'`);
         }
         bookmark[ attr ].time = dt;
         bookmark[ attr ].value = dv;

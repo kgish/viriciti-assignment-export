@@ -125,6 +125,7 @@ const getVehicleStats = (client: MongoClient, v: string, attribute: string, from
     });
 };
 
+// Take the results and generate a csv file.
 const handleResults = (v: string, from: string, to: string, results: any) => {
     const times = Object.keys(results).sort();
     const path = `${v}_${from}_${to}.csv`;
