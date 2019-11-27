@@ -127,6 +127,8 @@ export class AuthService {
 }
 ```
 
+If a request is received without the authentication header, a `401 UNAUTHORIZED` error is returned.
+
 ## API
 
 The API is relatively simple and consists of the following calls:
