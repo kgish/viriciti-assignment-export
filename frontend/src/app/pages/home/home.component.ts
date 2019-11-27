@@ -101,7 +101,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.form.get('vehicle').setValue(vehicles[0]);
       } else {
         this.snackbar.open(
-          'No vehicles found, either signin or ensure MongoDB is running and has been seeded with data.',
+          'No vehicles found, either signin again or ensure MongoDB is running and has been seeded with data.',
           'X', { duration: 5000 });
       }
     });
@@ -200,7 +200,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   disabledAttribute(name: string): boolean {
-    return this.getAttribute(name).disabled;
+    let result = true;
+    const attr = this.getAttribute(name);
+    if (attr) {
+      result = attr.disabled;
+    } else {
+      console.error(`disabledAttribute() invalid name='${ name }'`);
+    }
+    return result;
   }
 
   selectedIndexChange(event: number) {

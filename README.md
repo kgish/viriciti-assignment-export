@@ -77,7 +77,7 @@ The architecture needs to ensure that the export service will remain robust duri
 
 This means for example that the MongoDB will not become overloaded and that no performance hits arise for those trying to export the data.
 
-After some though, I came up with a strategy consisting of the following:
+After some thought, I came up with a strategy consisting of the following:
 
 * Restrict access to authorized users by using [JSON Web Tokens](https://jwt.io).
 * Use a [Rate Limiter](https://github.com/animir/node-rate-limiter-flexible) to throttle API calls.
