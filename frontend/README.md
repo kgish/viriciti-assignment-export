@@ -16,12 +16,11 @@ The user instructions for the application are very simple.
 * Hit the submit button
 * Results will be listed in the data table.
 * Filter, select and sort the results.
-* Download the csv file.
+* Download the CSV file.
 
-The vehicle attributes (soc, speed, current, odo and voltage) are listed as checkboxes in the column headers and can be checked in order to filter the results by only those records containing non-emoty values of that attribute.
+The vehicle attributes (soc, speed, current, odo and voltage) are listed as checkboxes in the column headers and can be checked in order to filter the results by only those records containing non-empty values of that attribute.
 
-Also, a list of radio buttons allow you to generate results per time interval (msec, sec, min, hour, day). This will redisplay the data by average value
-over the given time interval. The default view is msec.
+Also, a list of radio buttons allow you to generate results per time interval (msec, sec, min, hour, day). This will redisplay the data by average value over the given time interval. The default view is msec.
 
 There are two tabs displayed: table and chart. The default is table. By selected the chart tab you can view charts of the different attributes based
 on the displayed dataset.
@@ -31,10 +30,10 @@ Uses the [chartjs](https://www.chartjs.org) library.
 
 ## Authorization
 
-The application needs to login first to the backend using JWT authentication. Upon successful authgentication, the token is stored and passed with
+The application needs to login first to the backend using JWT authentication. Upon successful authentication, the token is stored and passed with
 each API request in the authentication header.
 
-This is taken care of by the token http interceptor.
+This is taken care of by the token HTTP interceptor.
 
 interceptors/token.interceptor.ts
 ```
@@ -51,7 +50,7 @@ interceptors/token.interceptor.ts
 
 ## Pages
 
-This is a very lightweigth application and only consists of the following (routed) pages.
+This is a very lightweight application and only consists of the following (routed) pages.
 
 * Signup
 * Signin
@@ -86,7 +85,7 @@ export class AuthGuard implements CanActivate {
 
 ## Proxy
 
-Any http calls starting with /api will be proxied to the backend target.
+Any HTTP calls starting with /api will be proxied to the backend target.
 
 proxy.conf.json
 ```
@@ -120,14 +119,14 @@ styles
 The `lib/utils` directory contains a number of useful utilities.
 
 * date-format: a collection of tools for formatting the date column in the data table.
-* export-to-csv: exports json to a csv file for downloading.
+* export-to-csv: exports JSON to a CSV file for downloading.
 * get-form-error: generic error messages for form validation.
 * aggregate-times: filter for displaying time intervals data table.
 
 
 ## Export
 
-The user can download a csv document by clicking on the download button.
+The user can download a CSV document by clicking on the download button.
 
 The file name is formatted as `${vehicle_name}-${from_date}-${to_date}.csv`
 

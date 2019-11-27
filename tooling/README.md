@@ -36,7 +36,7 @@ The `app.ts` is the main node program which does the following:
 * connect to MongoDB if possible
 * get vehicle stats: soc, speed, current, odo, voltage
 * collate results and order by date
-* generate a csv file
+* generate a CSV file
 
 
 ## Test
@@ -89,7 +89,7 @@ Closed connection to database
 Total processing time: 1523ms
 ```
 
-The csv file which is generated is called `vehicle_001_2018-10-01_2018-10-02.csv`.
+The CSV file which is generated is called `vehicle_001_2018-10-01_2018-10-02.csv`.
 
 Finally, you should cleanup.
 
@@ -112,7 +112,7 @@ fromDate = YYYY-MM-DD
 toDate = YYYY-MM-DD
 ```
 
-The csv file which is generated will be called `vehicle_00N_YYYY-MM-DD_.csv`.
+The CSV file which is generated will be called `vehicle_00N_YYYY-MM-DD_.csv`.
 
 ## Conclusion
 
