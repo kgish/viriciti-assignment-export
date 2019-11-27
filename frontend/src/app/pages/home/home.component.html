@@ -46,7 +46,7 @@
 
       <div fxFlex fxLayout fxLayoutGap="10px" fxLayoutAlign="end center">
         <mat-form-field class="filter" [class.hidden]="loading || !values || !values.length">
-          <input matInput (keyup)="applyFilter($event.target.value)"
+          <input matInput (keyup)="applyFilter($event)"
                  placeholder="Filter">
         </mat-form-field>
         <button mat-raised-button type="submit" [disabled]="form.invalid">Submit</button>
@@ -82,7 +82,8 @@
           <!-- Soc column -->
           <ng-container matColumnDef="soc">
             <th mat-header-cell [disabled]="disabledAttribute('soc')" *matHeaderCellDef mat-sort-header>
-              <mat-checkbox name="soc" [disabled]="disabledAttribute('soc')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+              <mat-checkbox name="soc" [disabled]="disabledAttribute('soc')" (click)="$event.stopPropagation();"
+                            (change)="changeAttribute($event)"
                             class="attribute">
                 soc
               </mat-checkbox>
@@ -94,7 +95,8 @@
           <!-- Speed column -->
           <ng-container matColumnDef="speed">
             <th mat-header-cell [disabled]="disabledAttribute('speed')" *matHeaderCellDef mat-sort-header>
-              <mat-checkbox name="speed" [disabled]="disabledAttribute('speed')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+              <mat-checkbox name="speed" [disabled]="disabledAttribute('speed')" (click)="$event.stopPropagation();"
+                            (change)="changeAttribute($event)"
                             class="attribute">
                 speed
               </mat-checkbox>
@@ -105,7 +107,8 @@
           <!-- Current column -->
           <ng-container matColumnDef="current">
             <th mat-header-cell [disabled]="disabledAttribute('current')" *matHeaderCellDef mat-sort-header>
-              <mat-checkbox name="current" [disabled]="disabledAttribute('current')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+              <mat-checkbox name="current" [disabled]="disabledAttribute('current')" (click)="$event.stopPropagation();"
+                            (change)="changeAttribute($event)"
                             class="attribute">
                 current
               </mat-checkbox>
@@ -116,7 +119,8 @@
           <!-- Odo column -->
           <ng-container matColumnDef="odo">
             <th mat-header-cell [disabled]="disabledAttribute('odo')" *matHeaderCellDef mat-sort-header>
-              <mat-checkbox name="odo" [disabled]="disabledAttribute('odo')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+              <mat-checkbox name="odo" [disabled]="disabledAttribute('odo')" (click)="$event.stopPropagation();"
+                            (change)="changeAttribute($event)"
                             class="attribute">
                 odo
               </mat-checkbox>
@@ -127,7 +131,8 @@
           <!-- Voltage column -->
           <ng-container matColumnDef="voltage">
             <th mat-header-cell [disabled]="disabledAttribute('voltage')" *matHeaderCellDef mat-sort-header>
-              <mat-checkbox name="voltage" [disabled]="disabledAttribute('voltage')" (click)="$event.stopPropagation();" (change)="changeAttribute($event)"
+              <mat-checkbox name="voltage" [disabled]="disabledAttribute('voltage')" (click)="$event.stopPropagation();"
+                            (change)="changeAttribute($event)"
                             class="attribute">
                 voltage
               </mat-checkbox>
@@ -150,7 +155,7 @@
           Charts
         </ng-template>
         <mat-tab-group (selectedIndexChange)="selectedIndexChange($event)" animationDuration="0">
-          <mat-tab>
+          <mat-tab *ngIf="disabledAttribute('soc')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">flag</mat-icon>
               SOC
@@ -159,7 +164,7 @@
               <canvas class="chart" id="soc-chart">{{ socChart }}</canvas>
             </div>
           </mat-tab>
-          <mat-tab>
+          <mat-tab *ngIf="disabledAttribute('speed')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">speed</mat-icon>
               Speed
@@ -168,7 +173,7 @@
               <canvas class="chart" id="speed-chart">{{ speedChart }}</canvas>
             </div>
           </mat-tab>
-          <mat-tab>
+          <mat-tab *ngIf="disabledAttribute('current')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">show_chart</mat-icon>
               Current
@@ -177,7 +182,7 @@
               <canvas class="chart" id="current-chart">{{ currentChart }}</canvas>
             </div>
           </mat-tab>
-          <mat-tab>
+          <mat-tab *ngIf="disabledAttribute('odod')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">dashboard</mat-icon>
               Odo
@@ -186,7 +191,7 @@
               <canvas class="chart" id="odo-chart">{{ odoChart }}</canvas>
             </div>
           </mat-tab>
-          <mat-tab>
+          <mat-tab *ngIf="disabledAttribute('voltage')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">battery_std</mat-icon>
               Voltage

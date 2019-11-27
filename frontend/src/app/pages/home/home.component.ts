@@ -190,7 +190,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this._resetDataSource();
   }
 
-  applyFilter(filterValue: string) {
+  applyFilter(event: any) {
+    const filterValue = event.target.value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
