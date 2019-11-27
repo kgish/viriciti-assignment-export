@@ -10,7 +10,7 @@ NestJS like Express Gateway allows developers to use a specific architecture by 
 
 By using TypeScript, advanced decorators provide an easy means of building modern APIs.
 
-Uses the refactores `unwind.stream.ts` located in the `/lib/utils` directory for accessing the MongoDB server.
+Uses the refactored `unwind.stream.ts` located in the `/lib/utils` directory for accessing the MongoDB server.
 
 
 ## Configuration
@@ -56,8 +56,7 @@ jwt:
 
 ## ENV
 
-The following environment variables can be used to override the configuration values, for example when starting it as
-a docker container using `docker-compose`.
+The following environment variables can be used to override the configuration values, for example when starting it as a docker container using `docker-compose`.
 
 ```
 # Postgres
@@ -109,8 +108,7 @@ $ npm run start:dev
 
 NestJS provides JWT support out of the box by using `passport` with the `passport-local` strategy.
 
-This is accomplished by creating an `AuthService` which implements a `validateUser` in order to validate
-the user name and password used.
+This is accomplished by creating an `AuthService` which implements a `validateUser` in order to validate the user name and password used.
 
 auth/auth.service.ts
 ```
@@ -209,7 +207,7 @@ GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
 
 ### Vehicle controller
 
-The controller takes a vehicle id, starting date and ending date as query parameters, and calls the underlying vehicles service to gather the stats from the MongoDB server. Returns a Promise.
+The controller takes a vehicle id, starting date and ending date as query parameters, and calls the underlying vehicles service to gather the stats from the MongoDB server. Returns a Promise. 
 
 src/vehicles/vehicles.controller.ts
 ```

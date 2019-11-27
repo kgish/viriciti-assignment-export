@@ -2,22 +2,23 @@
 
 ## Introduction
 
-The frontend is a responsive web application built using the latest version of Angular and the Matrerial Design CDK.
+The frontend is a responsive web application built using Angular and Material Design.
 
 ![Architecture Diagram](../images/screenshot-home-page.png)
 
 ## General information
 
-The instructions for the application are very simple.
+The user instructions for the application are very simple.
 
 * Login (first register if you haven't done so already)
-* Select vehicle name
+* Select a vehicle name
 * Select a date range
 * Hit the submit button
 * Results will be listed in the data table.
+* Filter, select and sort the results.
+* Download the csv file.
 
-The vehicle attributes (soc, speed, current, odo and voltage) are listed as checkboxes which can be checked in order to filtrer the results by only
-those records containing non-emoty values of that attribute.
+The vehicle attributes (soc, speed, current, odo and voltage) are listed as checkboxes in the column headers and can be checked in order to filter the results by only those records containing non-emoty values of that attribute.
 
 Also, a list of radio buttons allow you to generate results per time interval (msec, sec, min, hour, day). This will redisplay the data by average value
 over the given time interval. The default view is msec.

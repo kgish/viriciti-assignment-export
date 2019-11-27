@@ -6,18 +6,15 @@ In order to be able to better assess my technical expertise, the kind folks at V
 
 Hopefully the results will demonstrate that I am a qualified candidate and keep me in the loop of things.
 
-For the latest version of this assignment you can access my private [viriciti-assignment-export](https://github.com/kgish/viriciti-assignment-export)
-repository assuming I have designated you a collaborator.
+For the latest version of this assignment you can access my private [viriciti-assignment-export](https://github.com/kgish/viriciti-assignment-export) repository assuming I have designated you a collaborator.
 
 See my contact information below.
 
 ## Problem
 
-The main challenge is creating an export system that will not overflow the database system when a lot of export 
-requests are issued.
+The main challenge is creating an export system that will not overflow the database system when a lot of export requests are issued.
 
-The export system exposes a simple API which for a given vehicle and range of dates will return a dataset result 
-consisting off all data falling within the start date and end date.
+The export system exposes a simple API which for a given vehicle and range of dates will return a dataset result consisting off all data falling within the start date and end date.
 
 
 ## Assignment 
@@ -76,11 +73,9 @@ You should have some knowledge of the following and have the relevant items inst
 
 ## Architecture
 
-The architecture needs to ensure that the export service will remain robust during periods of high traffic, e.g. 
-intensive usage by multiple users exporting large volumes of data at the same time.
+The architecture needs to ensure that the export service will remain robust during periods of high traffic, e.g. intensive usage by multiple users exporting large volumes of data at the same time.
 
-This means for example that the MongoDB will not become overloaded and that no performance hits arise for those
-trying to export the data.
+This means for example that the MongoDB will not become overloaded and that no performance hits arise for those trying to export the data.
 
 After some though, I came up with a strategy consisting of the following:
 
@@ -99,12 +94,9 @@ For the sake of simplicity, I have left out scalability, clustering etc. and foc
 
 Of course, at a later time more discussion is possible.
  
-For example, about improvements like placing load-balancer(s) in front of the API server, using multiple
- instances of the API server, clustering MongoDB and/or Redis, using Balena for managing fleets of linux devices, 
- ad infinitum.
+For example, about improvements like placing load-balancer(s) in front of the API server, using multiple instances of the API server, clustering MongoDB and/or Redis, using Balena for managing fleets of linux devices, ad infinitum.
  
-Please note that when it comes to cloud computing and modern technologies, the sky is the limit (as long as you have a
-big enough budget and lots of time).
+Please note that when it comes to cloud computing and modern technologies, the sky is the limit (as long as you have a big enough budget and lots of time).
 
 ### MongoDB
 
@@ -210,8 +202,7 @@ $ mongdb-compass # verify vehicle databases were created
 $ docker-compose down -v
 ```
 
-Note: As an extra safety precaution, you will need to run the `mongo-restore.sh` script preceded with `FORCE=true` 
-in order actually to do the import.
+Note: As an extra safety precaution, you will need to run the `mongo-restore.sh` script preceded with `FORCE=true` in order actually to do the import.
 
 ### Verify
 
