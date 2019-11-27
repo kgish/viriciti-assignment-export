@@ -2,11 +2,9 @@
 
 ## Introduction
 
-In this project, I refactored the original coffeeScript `unwind.coffee` and `unwind_test.coffee` files from the original 
-assignment and converted them with TypeScript.
+In this project, I refactored the original coffeeScript `unwind.coffee` and `unwind_test.coffee` files from the original assignment and converted them with TypeScript.
 
-This was useful as I could better understand what these scripts do as well testing ore robust code which is type
-checked and conforms better to the newer ES6 standards.
+This was useful as I could better understand what these scripts do as well testing ore robust code which is type checked and conforms better to the newer ES6 standards.
 
 ## Directory
 

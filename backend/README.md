@@ -134,11 +134,13 @@ The API is relatively simple and consists of the following calls:
 ### Health check
 ```
 GET /health-check
+200 OK
 ```
 
 ### Verify token
 ```
 GET /verify-token
+200 OK | 401 UNAUTHORIZED
 ```
 
 ### Sign up new user
@@ -148,6 +150,7 @@ POST /signup
   name: kiffin
   password: secret
 }
+201 CREATED
 ```
 
 ### Login
@@ -157,6 +160,7 @@ POST /signin
   name: kiffin
   password: secret
 }
+200 OK | 400 BAD REQUEST
 ```
 
 ### Get all vehicles
@@ -169,6 +173,7 @@ GET /vehicles
   { "id": 1003, "name": "vehicle_003", "status": "REPAIR" },
   ...
 ]
+200 OK | 404 NOT FOUND | 401 UNAUTHORIZED
 ```
 
 ### Get one vehicle
@@ -176,6 +181,7 @@ GET /vehicles
 GET /vehicles/1003
 ...
 { "id": 1003, "name": "vehicle_003", "status": "REPAIR" }
+200 OK | 404 NOT FOUND | 401 UNAUTHORIZED
 ```
 
 ### Get values within date range for one vehicle
@@ -201,6 +207,7 @@ GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
   },
   ...
 ]
+200 OK | 404 NOT FOUND | 401 UNAUTHORIZED
 ```
 
 ## Vehicle stats
@@ -307,18 +314,18 @@ The call to `_getVehicleValuesById()` does the following:
 * Call redis server with this key.
 * If results, then return.
 * Otherwise, make parallel calls for each attribute: soc, speed, current, odo and voltage.
-* Collate and return the results
+* Collate and return the results.
 
 
 src/vehicles/vehicles.service.ts:_getVehicleValuesById()
 ```
-_getVehicleStatsPerDay(vehicle: IVehicle, fromDate: string, toDate: string) {
+_getVehicleStatsPerDay(veh: IVehicle, fromDate: string, toDate: string) {
 
-  const fn = `_getVehicleStatsPerDay() vehicle='${ vehicle.name }'`;
+  const fn = `_getVehicleStatsPerDay() vehicle='${ veh.name }'`;
 
   return new Promise((resolve, reject) => {
 
-    const rid = `${ vehicle.name }.${ fromDate.replace('-', '') }.${ toDate.replace('-', '') }`;
+    const rid = `${ veh.name }.${ fromDate.replace('-', '') }.${ toDate.replace('-', '') }`;
     this.redisClient.get(rid, (err, reply) => {
       if (reply) {
         resolve(JSON.parse(reply));
@@ -326,14 +333,15 @@ _getVehicleStatsPerDay(vehicle: IVehicle, fromDate: string, toDate: string) {
 
       if (err || !reply) {
 
-      const values = {};
+      const vals = {};
+      const mc = this.mongoClient;
 
       parallel([
-                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'soc', fromMS, toMS, values, callback),
-                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'speed', fromMS, toMS, values, callback),
-                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'current', fromMS, toMS, values, callback),
-                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'odo', fromMS, toMS, values, callback),
-                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'voltage', fromMS, toMS, values, callback),
+        cb => this._getVehicleStats(mc, veh, 'soc', fromMS, toMS, vals, cb),
+        cb => this._getVehicleStats(mc, veh, 'speed', fromMS, toMS, vals, cb),
+        cb => this._getVehicleStats(mc, veh, 'current', fromMS, toMS, vals, cb),
+        cb => this._getVehicleStats(mc, veh, 'odo', fromMS, toMS, vals, cb),
+        cb => this._getVehicleStats(mc, veh, 'voltage', fromMS, toMS, vals, cb),
       ], error => {
         if (error) {
           reject('NOK');
@@ -363,10 +371,10 @@ import * as config from 'config';
 const rlConfig = config.get('rate-limiter');
 
 export const rateLimiterConfig = {
-    type: process.env.RATE_LIMITER_TYPE || rlConfig.type,
-    points: process.env.RATE_LIMITER_POINTS || rlConfig.points,
-    duration: process.env.RATE_LIMITER_DURATION || rlConfig.duration,
-    keyprefix: process.env.RATE_LIMITER_KEYPREFIX || rlConfig.keyprefix,
+  type: process.env.RATE_LIMITER_TYPE || rlConfig.type,
+  points: process.env.RATE_LIMITER_POINTS || rlConfig.points,
+  duration: process.env.RATE_LIMITER_DURATION || rlConfig.duration,
+  keyprefix: process.env.RATE_LIMITER_KEYPREFIX || rlConfig.keyprefix,
 };
 ```
 where
