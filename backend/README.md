@@ -2,6 +2,17 @@
 
 ## Introduction
 
+The backend was built using [NestJS](https://nestjs.com) which is a progressive Node.js framework for building efficient, reliable and scalable server-side applications.
+
+Under the hood, NestJS makes use of the robust HTTP server Express framework.
+
+NestJS like Express Gateway allows developers to use a specific architecture by introducing Angular-like modules, services, and controllers, ensuring the application is scalable, highly testable, and loosely coupled.
+
+By using TypeScript, advanced decorators provide an easy means of building modern APIs.
+
+Uses the refactores `unwind.stream.ts` located in the `/lib/utils` directory for accessing the MongoDB server.
+
+
 ## Configuration
 
 All of the configuration parameters can be found in the `config/degfault.yml` file.
@@ -122,17 +133,17 @@ export class AuthService {
 
 The API is relatively simple and consists of the following calls:
 
-## Health check
+### Health check
 ```
 GET /health-check
 ```
 
-## Verify token
+### Verify token
 ```
 GET /verify-token
 ```
 
-## Sign up new user
+### Sign up new user
 ```
 POST /signup
 {
@@ -141,7 +152,7 @@ POST /signup
 }
 ```
 
-## Login
+### Login
 ```
 POST /signin
 {
@@ -150,7 +161,7 @@ POST /signin
 }
 ```
 
-## Get all vehicles
+### Get all vehicles
 ```
 GET /vehicles
 ...
@@ -162,14 +173,14 @@ GET /vehicles
 ]
 ```
 
-## Get one vehicle
+### Get one vehicle
 ```
 GET /vehicles/1003
 ...
 { "id": 1003, "name": "vehicle_003", "status": "REPAIR" }
 ```
 
-## Get values within date range for one vehicle
+### Get values within date range for one vehicle
 ```
 GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
 ...
@@ -193,6 +204,153 @@ GET /vehicles/1003/values?fromDate=yyyy-mm-dd&toDate=yyyy-mm-dd
   ...
 ]
 ```
+
+## Vehicle stats
+
+### Vehicle controller
+
+The controller takes a vehicle id, starting date and ending date as query parameters, and calls the underlying vehicles service to gather the stats from the MongoDB server. Returns a Promise.
+
+src/vehicles/vehicles.controller.ts
+```
+@Controller('vehicles')
+@UseGuards(AuthGuard())
+export class VehiclesController {
+
+  constructor(private vehiclesService: VehiclesService) {}
+  ...
+    
+  @Get('/:id/values')
+  getVehicleValuesById(
+    @Query('fromDate') fromDate,
+    @Query('toDate') toDate,
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<IValue[]> {
+    this.logger.log(`getVehicleValuesById() user='${ user }' id='${ id }' \
+                     fromDate='${ fromDate }' toDate='${ toDate }'`);
+    return this.vehiclesService.getVehicleValuesById(id, user, fromDate, toDate);
+  }
+  ...
+}
+```
+
+### Vehicle service
+
+Normally a data service will access a repository factory, but for the cases for MongoDB and Redis I have chosen instead to connect during initialization and use the client handles to make the calls to the underlying `MongdbService` and `RedisService` modules.
+
+src/vehicles/vehicles.service.ts:constructor()
+```
+@Injectable()
+export class VehiclesService {
+
+  private mongoClient: MongoClient;
+  private redisClient: RedisClient;
+
+  private vehicles: IVehicle[];
+
+  constructor(
+    @InjectRepository(VehicleRepository)
+    private vehicleRepository: VehicleRepository,
+    private mongodb: MongodbService,
+    private redis: RedisService,
+  ) {
+    this.redisClient = redis.client;
+    this.mongoClient = mongodb.client;
+    this.vehicles = mongodb.getVehicles();
+  }
+  ...
+}
+```
+
+src/vehicles/vehicles.service.ts:getVehicleValuesById()
+```
+  async getVehicleValuesById(
+    id: number,
+    user: User,
+    fromDate: string,
+    toDate: string,
+  ): Promise<any> {
+  
+    // Get the vehicle name.
+    const vehicle = this.vehicles.find(v => v.id === +id);
+
+    // Split the time interval into day blocks.
+    for (let t = fromMS; t < toMS; t += MSECS_PER_DAY) {
+      blocks.push({
+        fromDate: dateYYYYMMDD(new Date(t)),
+        toDate: dateYYYYMMDD(new Date(t + MSECS_PER_DAY)),
+      });
+    }
+    
+    // Create an array of promises.
+    blocks.forEach(block => {
+      const from = block.fromDate;
+      const to = block.toDate;
+      promises.push(
+        new Promise((resolve, reject) => resolve(this._getVehicleStatsPerDay(vehicle, from, to))),
+      );
+    });
+
+    // Return the promise.
+    return new Promise((resolve, reject) => {
+      Promise.all(promises).then(arrays => {
+        let result = [];
+        arrays.forEach(array => array.forEach(item => result.push(item)));
+        resolve(result);
+      });
+    });
+}
+```
+
+The call to `_getVehicleValuesById()` does the following:
+
+* Build redis key `rid = '${vehicle}.${from}.${to}'`
+* Call redis server with this key.
+* If results, then return.
+* Otherwise, make parallel calls for each attribute: soc, speed, current, odo and voltage.
+* Collate and return the results
+
+
+src/vehicles/vehicles.service.ts:_getVehicleValuesById()
+```
+_getVehicleStatsPerDay(vehicle: IVehicle, fromDate: string, toDate: string) {
+
+  const fn = `_getVehicleStatsPerDay() vehicle='${ vehicle.name }'`;
+
+  return new Promise((resolve, reject) => {
+
+    const rid = `${ vehicle.name }.${ fromDate.replace('-', '') }.${ toDate.replace('-', '') }`;
+    this.redisClient.get(rid, (err, reply) => {
+      if (reply) {
+        resolve(JSON.parse(reply));
+      }
+
+      if (err || !reply) {
+
+      const values = {};
+
+      parallel([
+                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'soc', fromMS, toMS, values, callback),
+                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'speed', fromMS, toMS, values, callback),
+                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'current', fromMS, toMS, values, callback),
+                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'odo', fromMS, toMS, values, callback),
+                           callback => this._getVehicleStats(this.mongoClient, vehicle, 'voltage', fromMS, toMS, values, callback),
+      ], error => {
+        if (error) {
+          reject('NOK');
+        } else {
+          const converted = this._convertValues(values);
+          this.redisClient.set(rid, JSON.stringify(converted));
+          resolve(converted);
+        }
+      });
+  }    
+}
+```
+
+The `_convertValues()` function will collate the array of results into a single result ordered by timestamp.
+
 
 ## Rate limiter
 
