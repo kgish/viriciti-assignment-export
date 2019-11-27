@@ -41,8 +41,8 @@ These are the steps that I took in order to tackle this challenging assignment:
 
 * Brush up on MongoDB.
 * Rewrite the unwind utility and test in ES6 using TypeScript.
-* Verify that the rewriten test works using a test MongoDB.
-* Create a MongDB docker container and import the data dump.
+* Verify that the rewritten test works using a test MongoDB.
+* Create a MongoDB docker container and import the data dump.
 * Tried to learn [Express Gateway](https://www.express-gateway.io) but time was too limited.
 * Decided instead to use [NestJS](https://nestjs.com) which is more familiar to me.
 * Build the backend API server.
@@ -77,7 +77,7 @@ You should have some knowledge of the following and have the relevant items inst
 ## Architecture
 
 The architecture needs to ensure that the export service will remain robust during periods of high traffic, e.g. 
-instensive usage by multiple users exporting large volumes of data at the samer time.
+intensive usage by multiple users exporting large volumes of data at the same time.
 
 This means for example that the MongoDB will not become overloaded and that no performance hits arise for those
 trying to export the data.
@@ -91,7 +91,7 @@ After some though, I came up with a strategy consisting of the following:
 * Offload the actual export to the frontend client.
 * Allow users to interact with the dataset using filters, sorting, etc.
 
-Here is a high-level diagram illustrating these architectural prinicples:
+Here is a high-level diagram illustrating these architectural principles:
 
 ![Architecture Diagram](images/architecture.png)
 
@@ -210,7 +210,7 @@ $ mongdb-compass # verify vehicle databases were created
 $ docker-compose down -v
 ```
 
-Note: As an extrra safety precaution, you will need to run the `mongo-restore.sh` script preceded with `FORCE=true` 
+Note: As an extra safety precaution, you will need to run the `mongo-restore.sh` script preceded with `FORCE=true` 
 in order actually to do the import.
 
 ### Verify
