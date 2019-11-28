@@ -38,14 +38,14 @@ This is taken care of by the token HTTP interceptor.
 interceptors/token.interceptor.ts
 ```
 @Injectable()
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-    if (this.token) {
-      request = request.clone({ setHeaders: { Authorization: `Bearer ${this.token}` } });
-    }
-
-    return next.handle(request);
+  if (this.token) {
+    request = request.clone({ setHeaders: { Authorization: `Bearer ${this.token}` } });
   }
+
+  return next.handle(request);
+}
 ```
 
 ## Pages
