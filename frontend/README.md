@@ -149,7 +149,7 @@ onDownload() {
 }
 ```
 
-For more details, see [lib/utils/export-to-csv.ts](frontend/src/app/lib/utils/export-to-csv.ts).
+For more details, see [lib/utils/export-to-csv.ts](src/app/lib/utils/export-to-csv.ts).
 
 
 ## Quality Assurance
