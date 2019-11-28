@@ -155,49 +155,49 @@
           Charts
         </ng-template>
         <mat-tab-group (selectedIndexChange)="selectedIndexChange($event)" animationDuration="0">
-          <mat-tab *ngIf="disabledAttribute('soc')">
+          <mat-tab *ngIf="!disabledAttribute('soc')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">flag</mat-icon>
               SOC
             </ng-template>
             <div class="chart soc">
-              <canvas class="chart" id="soc-chart">{{ socChart }}</canvas>
+              <canvas class="chart" id="soc-chart"></canvas>
             </div>
           </mat-tab>
-          <mat-tab *ngIf="disabledAttribute('speed')">
+          <mat-tab *ngIf="!disabledAttribute('speed')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">speed</mat-icon>
               Speed
             </ng-template>
             <div class="chart speed">
-              <canvas class="chart" id="speed-chart">{{ speedChart }}</canvas>
+              <canvas class="chart" id="speed-chart"></canvas>
             </div>
           </mat-tab>
-          <mat-tab *ngIf="disabledAttribute('current')">
+          <mat-tab *ngIf="!disabledAttribute('current')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">show_chart</mat-icon>
               Current
             </ng-template>
             <div class="chart current">
-              <canvas class="chart" id="current-chart">{{ currentChart }}</canvas>
+              <canvas class="chart" id="current-chart"></canvas>
             </div>
           </mat-tab>
-          <mat-tab *ngIf="disabledAttribute('odo')">
+          <mat-tab *ngIf="!disabledAttribute('odo')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">dashboard</mat-icon>
               Odo
             </ng-template>
             <div class="chart odo">
-              <canvas class="chart" id="odo-chart">{{ odoChart }}</canvas>
+              <canvas class="chart" id="odo-chart"></canvas>
             </div>
           </mat-tab>
-          <mat-tab *ngIf="disabledAttribute('voltage')">
+          <mat-tab *ngIf="!disabledAttribute('voltage')">
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">battery_std</mat-icon>
               Voltage
             </ng-template>
             <div class="chart voltage">
-              <canvas class="chart" id="voltage-chart">{{ voltageChart }}</canvas>
+              <canvas class="chart" id="voltage-chart"></canvas>
             </div>
           </mat-tab>
 

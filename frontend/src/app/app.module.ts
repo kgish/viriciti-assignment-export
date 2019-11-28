@@ -21,7 +21,6 @@ import {
 
 // --- PAGES --- //
 import {
-  ChartComponent,
   HomeComponent,
   SigninComponent,
   SignupComponent
@@ -45,8 +44,7 @@ import {
     HeaderComponent,
     HomeComponent,
     SigninComponent,
-    SignupComponent,
-    ChartComponent
+    SignupComponent
   ],
   imports: [
     AppRoutingModule,

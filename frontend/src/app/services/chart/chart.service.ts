@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Chart, ChartConfiguration } from 'chart.js';
+import { Chart, ChartConfiguration, TimeUnit } from 'chart.js';
 
 const chartColors = {
   red: 'rgb(255, 99, 132)',
@@ -11,10 +11,22 @@ const chartColors = {
   grey: 'rgb(201, 203, 207)'
 };
 
+// units: Unit[] = [ 'msec', 'sec', 'min', 'hour', 'day' ];
+const convertUnits = {
+  msec: 'millisecond',
+  sec: 'second',
+  min: 'minute',
+  hour: 'hour',
+  day: 'day'
+};
+
+const fn = 'ChartService';
+
 export interface IChartData {
   x: number;
   y: number;
 }
+
 
 @Injectable({
   providedIn: 'root'
@@ -25,32 +37,45 @@ export class ChartService {
   constructor() {
   }
 
-  renderChart(id: string, data: IChartData[]): Chart {
-    return new Chart(id, this._config(data));
+  renderChart(id: string, data: IChartData[], unit = 'msec', color = 'blue'): Chart {
+    let convertedUnit: TimeUnit = convertUnits[unit];
+    if (!convertedUnit) {
+      console.error(`${fn} renderChart() invalid unit='${unit}'`);
+      convertedUnit = 'millisecond';
+    }
+    let convertedColor = chartColors[color];
+    if (!convertedColor) {
+      console.error(`${fn} renderChart() invalid color='${color}'`);
+      convertedColor = 'blue';
+    }
+    return new Chart(id, this._config(data, convertedUnit, convertedColor));
   }
 
   // Private
 
-  _config(data: IChartData[]): ChartConfiguration {
+  _config(data: IChartData[], unit: TimeUnit = 'millisecond', color = chartColors.blue): ChartConfiguration {
     return {
       type: 'line',
       data: {
-        labels: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July' ],
         datasets: [ {
-          backgroundColor: chartColors.blue,
-          borderColor: chartColors.blue,
           data,
+          backgroundColor: color,
+          borderColor: color,
+          lineTension: 0,
           fill: false,
         } ]
       },
       options: {
         responsive: true,
-        legend: {display: false},
+        legend: { display: false },
         title: { display: false },
         tooltips: { mode: 'index', intersect: false, },
         hover: { mode: 'nearest', intersect: true },
         scales: {
           xAxes: [ {
+            type: 'time',
+            time: { unit },
+            ticks: { source: 'data' },
             display: true,
             scaleLabel: { display: true, labelString: 'Time' }
           } ],

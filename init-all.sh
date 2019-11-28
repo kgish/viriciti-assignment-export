@@ -11,8 +11,8 @@
 #
 # ----------------------------------------------------------------------------
 
-# Make certain scripts executable
-chmod +x ./mongo-restore.sh ./start-all.sh
+# Make certain all scripts are executable
+chmod +x *.sh
 
 # Run npm install in all directories
 for dir in tooling backend frontend
@@ -21,6 +21,8 @@ do
     (cd backend && npm install)
     (cd frontend && npm install)
 done
+
+sudo apt-get install jq
 
 echo Done!
 

@@ -3,10 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator, MatRadioChange, MatSnackBar, MatSort, MatTableDataSource } from '@angular/material';
 import { Subscription } from 'rxjs';
 
-import { Chart, ChartOptions } from 'chart.js';
-
 import {
   AuthService,
+  ChartService, IChartData,
   IValue,
   IVehicle,
   VehicleService
@@ -36,6 +35,8 @@ interface ICheckbox {
   checked: boolean;
   disabled: boolean;
 }
+
+const fn = 'HomeComponent';
 
 @Component({
   selector: 'app-home',
@@ -80,17 +81,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   chartNames = [ 'soc', 'speed', 'current', 'odo', 'voltage' ];
 
-  socChart: Chart;
-  speedChart: Chart;
-  currentChart: Chart;
-  odoChart: Chart;
-  voltageChart: Chart;
-
   private subscription: Subscription;
 
   constructor(private vehiclesService: VehicleService,
               private snackbar: MatSnackBar,
               private auth: AuthService,
+              private chartService: ChartService,
               private fb: FormBuilder) {
   }
 
@@ -210,43 +206,34 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return result;
   }
 
-  selectedIndexChange(event: number) {
+  // TODO: FRONTEND Use real data instead of dummy data.
+  selectedIndexChange(index: number) {
+    const tabs = this.attributes.filter(a => !a.disabled).map(a => a.name);
+    const attr = tabs[index];
 
-    const chart = this.chartNames[event];
+    if (attr) {
+      const chartId = `${ attr }-chart`;
+      const n = this._randomScalingFactor(100);
+      const len = this._randomScalingFactor(100);
+      const data = [];
 
-    const type = 'line';
+      let next = 0;
 
-    setTimeout(() => {
-      // const { miny, maxy, data } = this._getDataValues(chart);
-      const data = [
-        { x: 10, y: 29 },
-        { x: 11, y: 26 },
-        { x: 12, y: 21 },
-        { x: 15, y: 20 },
-        { x: 19, y: 28 },
-        { x: 20, y: 22 },
-        { x: 25, y: 22 },
-        { x: 27, y: 27 },
-        { x: 28, y: 29 },
-        { x: 33, y: 23 },
-      ];
+      for (let j = 0; j < len; j++) {
+        data.push({
+          x: next,
+          y: this._randomScalingFactor(n)
+        });
+        next += this._randomScalingFactor(10);
+      }
 
-      // const options = this._setChartOptions(miny, maxy);
-      const options = this._setChartOptions(20, 29);
-
-      // console.log(`miny='${ miny }' maxy='${ maxy }'`);
-      // console.log(data);
-
-      this.socChart = new Chart(`${ chart }-chart`, {
-        type,
-        data: {
-          labels: [],
-          datasets: [ { fill: false, data } ]
-        },
-        options
-      });
-    }, 200);
-
+      setTimeout(() =>
+          this.chartService.renderChart(chartId, data, this.currentUnit, 'blue'),
+        // this.chartService.renderChart(chartId, this._convertData(this.dataSource.data, this.currentUnit), this.currentUnit),
+        500);
+    } else {
+      console.log(`${ fn } selectedIndexChange() invalid index='${ index }'`);
+    }
   }
 
   // Private
@@ -264,7 +251,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   _resetDataSource(): IValue[] {
-
     let filteredValues = this.values;
 
     if (!this.values || !this.values.length) {
@@ -288,46 +274,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return filteredValues;
   }
 
-  // --- CHART --- //
-
-  _setChartOptions(miny: number, maxy: number): ChartOptions {
-    return {
-      responsive: true,
-      legend: { display: false },
-      scales: {
-        yAxes: [ {
-          ticks: {
-            min: miny,
-            max: maxy
-          }
-        } ]
-      }
-    };
+  // Convert IValue data records to Chart data records { x: xval, y: yval }
+  _convertData(data: IValue[], attr: string): IChartData[] {
+    return data.map(d => ({ x: d.time, y: d[attr] }));
   }
 
-  // Convert data to an array of (x, y) points, miny and maxy, ignoring undefined (null) values
-  _getDataValues(chart: string): IDataValues {
-    const result: IDataValues = { miny: 0, maxy: 0, data: [] };
-    let first = true;
-    this.values.forEach(v => {
-      const x = v.time;
-      const y = v[chart];
-      if (y !== null) {
-        if (first) {
-          if (result.miny > y) {
-            result.miny = y;
-          }
-          if (result.maxy < y) {
-            result.maxy = y;
-          }
-          first = false;
-        } else {
-          result.miny = y;
-          result.maxy = y;
-        }
-        result.data.push({ x, y });
-      }
-    });
-    return result;
+  _randomScalingFactor(n: number) {
+    return Math.round(n * (Math.random() + 1));
   }
 }

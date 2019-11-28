@@ -20,6 +20,7 @@ const filters = {
 
 const fn = 'aggregateTimes';
 
+// TODO: FRONTEND Get aggregateTimes() algoirithn to work correctly.
 export function aggregateTimes(data: IValue[], unit: Unit, enabled: string[]): IValue[] {
   const result: IValue[] = [];
   const filter = filters[ unit ];
@@ -27,7 +28,7 @@ export function aggregateTimes(data: IValue[], unit: Unit, enabled: string[]): I
 
   const fx = `${fn} aggregateTimes()`;
 
-  console.log(`${fx} unit='${unit}' enabled='${JSON.stringify(enabled)}'`);
+  // console.log(`${fx} unit='${unit}' enabled='${JSON.stringify(enabled)}'`);
 
   // Setup all the initial values
   const v0 = data[ 0 ];
@@ -88,12 +89,12 @@ export function aggregateTimes(data: IValue[], unit: Unit, enabled: string[]): I
 // for restarting the new time interval.
 const createList = (bookmark, time, attributes) => {
   const fx = `${fn} createList()`;
-  console.log(`${fx} bookmark='${JSON.stringify(bookmark)}' time='${time}' attributes='${attributes}'`);
+  // console.log(`${fx} bookmark='${JSON.stringify(bookmark)}' time='${time}' attributes='${attributes}'`);
 
   const result = { time };
   attributes.forEach(attr => result[ attr ] = bookmark[ attr ].value);
 
-  console.log(`${fx} result='${JSON.stringify(result)}'`);
+  // console.log(`${fx} result='${JSON.stringify(result)}'`);
   return result;
 };
 
@@ -104,17 +105,17 @@ const createList = (bookmark, time, attributes) => {
 const finalizeList = (list, t, unit: Unit, attributes: string[]) => {
   const fx = `${fn} finalizeList()`;
 
-  console.log(`${fx} list='${JSON.stringify(list)}' t='${t}' unit='${unit}' attributes='${attributes}'`);
+  // console.log(`${fx} list='${JSON.stringify(list)}' t='${t}' unit='${unit}' attributes='${attributes}'`);
   const result = list[ t ];
-  console.log(`${fx} BEFORE: result='${JSON.stringify(result)}'`);
+  // console.log(`${fx} BEFORE: result='${JSON.stringify(result)}'`);
   attributes.forEach(attr => {
-    console.log(`${fx} attr='${attr}' BEFORE: result='${result[ attr ]}'`);
+    // console.log(`${fx} attr='${attr}' BEFORE: result='${result[ attr ]}'`);
     if (result[ attr ]) {
       result[ attr ] /= unitIntervals[ unit ];
     }
-    console.log(`${fx} attr='${attr}' AFTER:  result='${result[ attr ]}'`);
+    // console.log(`${fx} attr='${attr}' AFTER:  result='${result[ attr ]}'`);
   });
-  console.log(`${fx} AFTER:  result='${JSON.stringify(result)}'`);
+  // console.log(`${fx} AFTER:  result='${JSON.stringify(result)}'`);
   return result;
 };
 

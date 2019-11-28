@@ -58,7 +58,7 @@ You should have some knowledge of the following and have the relevant items inst
 
 * Angular
 * Chai
-* Chartjs
+* ChartJS
 * Docker
 * Git
 * Jasmine
@@ -285,7 +285,9 @@ This is where all of the code related to the NestJS project is kept.
 │   │   └── typeorm.config.ts
 │   ├── health-check/
 │   ├── lib
-│   │   └── utils/
+│   │   └── utils
+│   │       ├── date-format.ts
+│   │       └── unwind.stream.ts
 │   ├── main.ts
 │   ├── microservices/
 │   ├── vehicles/

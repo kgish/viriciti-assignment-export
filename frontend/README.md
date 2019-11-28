@@ -25,7 +25,7 @@ Also, a list of radio buttons allow you to generate results per time interval (m
 There are two tabs displayed: table and chart. The default is table. By selected the chart tab you can view charts of the different attributes based
 on the displayed dataset.
 
-Uses the [chartjs](https://www.chartjs.org) library.
+Uses the [chartJS](https://www.chartjs.org) library.
 
 
 ## Authorization
@@ -82,6 +82,11 @@ export class AuthGuard implements CanActivate {
   }
 }
 ```
+
+## Charts
+
+The charts are generated using the [ChartJS](https://www.chartjs.org/) library. Based on the data which is visible in the table, the relevant line chart is created.
+
 
 ## Proxy
 
@@ -177,4 +182,5 @@ $ npm run e2e
 * [JWT](https://jwt.io)
 * [Material CDK](https://material.angular.io)
 * [TypeScript](https://www.typescriptlang.org)
+* [ChartJS](https://www.chartjs.org)
 * [export-to-csv](https://www.npmjs.com/package/export-to-csv)
